@@ -1,0 +1,517 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/OptimalBits/bull#readme"
+
+    >bull (v2.2.6)</a>
+</h1>
+<h4>Job manager</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.bull">module bull</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.bull">
+            function <span class="apidocSignatureSpan"></span>bull
+            <span class="apidocSignatureSpan">(name, redisPort, redisHost, redisOptions)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_">
+            function <span class="apidocSignatureSpan">bull.</span>super_
+            <span class="apidocSignatureSpan">(pubClient, subClient)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.toString">
+            function <span class="apidocSignatureSpan">bull.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">bull.</span>super_.prototype</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.bull.super_">module bull.super_</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_.super_">
+            function <span class="apidocSignatureSpan">bull.</span>super_
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.bull.super_.prototype">module bull.super_.prototype</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_.prototype.distEmit">
+            function <span class="apidocSignatureSpan">bull.super_.prototype.</span>distEmit
+            <span class="apidocSignatureSpan">(evt)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_.prototype.off">
+            function <span class="apidocSignatureSpan">bull.super_.prototype.</span>off
+            <span class="apidocSignatureSpan">(evt, listener)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_.prototype.on">
+            function <span class="apidocSignatureSpan">bull.super_.prototype.</span>on
+            <span class="apidocSignatureSpan">(evt, listener, isGlobal)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.bull.super_.prototype.removeListener">
+            function <span class="apidocSignatureSpan">bull.super_.prototype.</span>removeListener
+            <span class="apidocSignatureSpan">(evt, listener)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.bull" id="apidoc.module.bull">module bull</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.bull.bull" id="apidoc.element.bull.bull">
+        function <span class="apidocSignatureSpan"></span>bull
+        <span class="apidocSignatureSpan">(name, redisPort, redisHost, redisOptions)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Queue(name, redisPort, redisHost, redisOptions){
+  if(!(this instanceof Queue)){
+    return new Queue(name, redisPort, redisHost, redisOptions);
+  }
+
+  if(_.isObject(redisPort)) {
+    var opts = redisPort;
+    var redisOpts = opts.redis || {};
+    redisPort = redisOpts.port;
+    redisHost = redisOpts.host;
+    redisOptions = redisOpts.opts || {};
+    redisOptions.db = redisOpts.DB || redisOpts.DB;
+  } else if(parseInt(redisPort) == redisPort) {
+    redisPort = parseInt(redisPort);
+    redisOptions =  redisOptions || {};
+  } else if(_.isString(redisPort)) {
+    try {
+      var redisUrl = url.parse(redisPort);
+      assert(_.isObject(redisHost) || _.isUndefined(redisHost),
+          &#x27;Expected an object as redis option&#x27;);
+      redisOptions =  redisHost || {};
+      redisPort = redisUrl.port;
+      redisHost = redisUrl.hostname;
+      if (redisUrl.auth) {
+        redisOptions.password = redisUrl.auth.split(&#x27;:&#x27;)[1];
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  redisOptions = redisOptions || {};
+
+  function createClient(type) {
+    var client;
+    if(_.isFunction(redisOptions.createClient)){
+      client = redisOptions.createClient(type);
+    }else{
+      client = new redis(redisPort, redisHost, redisOptions);
+    }
+    return client;
+  }
+
+  redisPort = redisPort || 6379;
+  redisHost = redisHost || &#x27;127.0.0.1&#x27;;
+
+  var _this = this;
+
+  this.name = name;
+  this.keyPrefix = redisOptions.keyPrefix || &#x27;bull&#x27;;
+
+  //
+  // We cannot use ioredis keyPrefix feature until we
+  // stop creating keys dynamically in lua scripts.
+  //
+  delete redisOptions.keyPrefix;
+
+  //
+  // Create queue client (used to add jobs, pause queues, etc);
+  //
+  this.client = createClient(&#x27;client&#x27;);
+
+  getRedisVersion(this.client).then(function(version){
+    if(semver.lt(version, MINIMUM_REDIS_VERSION)){
+      throw new Error(&#x27;Redis version needs to be greater than &#x27; + MINIMUM_REDIS_VERSION + &#x27;. Current: &#x27; + version);
+    }
+  }).catch(function(err){
+    _this.emit(&#x27;error&#x27;, err);
+  });
+
+  //
+  // Keep track of cluster clients for redlock
+  //
+  this.clients = [this.client];
+  if (redisOptions.clients) {
+    this.clients.push.apply(this.clients, redisOptions.clients);
+  }
+  this.redlock = {
+    driftFactor: REDLOCK_DRIFT_FACTOR,
+    retryCount: REDLOCK_RETRY_COUNT,
+    retryDelay: REDLOCK_RETRY_DELAY
+  };
+  _.extend(this.redlock, redisOptions.redlock || {});
+
+  //
+  // Create blocking client (used to wait for jobs)
+  //
+  this.bclient = createClient(&#x27;block&#x27;);
+
+  //
+  // Create event subscriber client (receive messages from other instance of the queue)
+  //
+  this.eclient = createClient(&#x27;subscriber&#x27;);
+
+  this.delayTimer = null;
+  this.processing = 0;
+  this.retrieving = 0;
+
+  this.LOCK_RENEW_TIME = LOCK_RENEW_TIME;
+  this.LOCK_DURATION = LOCK_DURATION;
+  this.STALLED_JOB_CHECK_INTERVAL = STALLED_JOB_CHECK_INTERVAL;
+  this.MAX_STALLED_JOB_COUNT = MAX_STALLED_JOB_COUNT;
+
+  // bubble up Redis error events
+  [this.client, this.bclient, this.eclient].forEach(function (client) {
+    client.on(&#x27;error&#x27;, _this.emit.bind(_this, &#x27;error&#x27;));
+  });
+
+  // keeps track of active timers. used by close() to
+  // ensure that disconnect() is deferred until all
+  // scheduled redis commands have been executed
+  this.timers = new TimerManager();
+
+  // emit ready when redis connections ready
+  var initializers = [this.client, this.bclient, this.eclient].map(function (client) {
+    return new Promise(function(resolve, reject) {
+      client.once(&#x27;ready&#x27;, resolve);
+      client.once(&#x27;error&#x27;, reject);
+    });
+  });
+
+  this._initializing = Promise.all(initializers).then(function(){
+    return Promise.join(
+      _this.eclient.subscribe(_this.toKey(&#x27;delayed&#x27;)),
+      _this.eclient.subscribe(_this.toKey(&#x27;paused&#x27;))
+    );
+  }).then(function(){
+    debuglog(name + &#x27; queue ready&#x27;);
+    _this.emit(&#x27;ready&#x27;);
+  }, function(err){
+    console.error(&#x27;Error initializing queue:&#x27;, err);
+  });
+
+  Disturbed.call(this, _this.client, _this.eclient);
+
+  //
+  // Listen distributed queue events
+  //
+  listenDistEvent(&#x27;stalled&#x27;); //
+  listenDistEvent(&#x27;active&#x27;); //
+  listenDist ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_" id="apidoc.element.bull.super_">
+        function <span class="apidocSignatureSpan">bull.</span>super_
+        <span class="apidocSignatureSpan">(pubClient, subClient)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">super_ = function (pubClient, subClient) {
+  var _this = this;
+  EventEmitter.call(this);
+
+  this.uuid = uuid();
+  this.pubClient = pubClient;
+  this.subClient = subClient;
+
+  subClient.on(&#x27;message&#x27;, function (channel, msg) {
+
+    var count = _this.listenerCount(channel);
+    if (count) {
+      var args;
+      try {
+        args = JSON.parse(msg);
+      } catch (err) {
+        console.error(&#x27;Parsing event message&#x27;, err);
+      }
+
+      if (args[0] !== _this.uuid) {
+        args[0] = channel;
+        _this.emit.apply(_this, args);
+      }
+    }
+  });
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.bull.toString" id="apidoc.element.bull.toString">
+        function <span class="apidocSignatureSpan">bull.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return toString;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.bull.super_" id="apidoc.module.bull.super_">module bull.super_</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_.super_" id="apidoc.element.bull.super_.super_">
+        function <span class="apidocSignatureSpan">bull.</span>super_
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function EventEmitter() {
+  EventEmitter.init.call(this);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.bull.super_.prototype" id="apidoc.module.bull.super_.prototype">module bull.super_.prototype</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_.prototype.distEmit" id="apidoc.element.bull.super_.prototype.distEmit">
+        function <span class="apidocSignatureSpan">bull.super_.prototype.</span>distEmit
+        <span class="apidocSignatureSpan">(evt)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">distEmit = function (evt) {
+  var _this = this;
+  var args = Array.prototype.slice.call(arguments);
+  this.emit.apply(this, args);
+
+  args[0] = this.uuid;
+
+  // Emit to other nodes
+  return new Promise(function (resolve, reject) {
+    _this.pubClient.publish(evt, JSON.stringify(args), function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_.prototype.off" id="apidoc.element.bull.super_.prototype.off">
+        function <span class="apidocSignatureSpan">bull.super_.prototype.</span>off
+        <span class="apidocSignatureSpan">(evt, listener)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">off = function (evt, listener) {
+  var _this = this;
+  var args = Array.prototype.slice.call(arguments);
+  EventEmitter.prototype.removeListener.apply(this, args);
+
+  // TODO: we should take into consideration isGlobal.
+  if (!_this.listenerCount(evt)) {
+    _this.subClient.unsubscribe(evt);
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_.prototype.on" id="apidoc.element.bull.super_.prototype.on">
+        function <span class="apidocSignatureSpan">bull.super_.prototype.</span>on
+        <span class="apidocSignatureSpan">(evt, listener, isGlobal)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">on = function (evt, listener, isGlobal) {
+  var _this = this;
+  var args = Array.prototype.slice.call(arguments);
+  EventEmitter.prototype.on.apply(this, args);
+
+  if (isGlobal) {
+    return new Promise(function (resolve, reject) {
+      _this.subClient.subscribe(args[0], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    })
+  }
+  return Promise.resolve(void 0);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+queue.resume().then(function(){
+  // queue is resumed now
+})
+```
+
+A queue emits also some useful events:
+```javascript
+.<span class="apidocCodeKeywordSpan">on</span>(&#x27;ready&#x27;, function() {
+  // Queue ready for job
+  // All Redis connections are done
+})
+.on(&#x27;error&#x27;, function(error) {
+  // Error
+})
+.on(&#x27;active&#x27;, function(job, jobPromise){
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.bull.super_.prototype.removeListener" id="apidoc.element.bull.super_.prototype.removeListener">
+        function <span class="apidocSignatureSpan">bull.super_.prototype.</span>removeListener
+        <span class="apidocSignatureSpan">(evt, listener)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">removeListener = function (evt, listener) {
+  var _this = this;
+  var args = Array.prototype.slice.call(arguments);
+  EventEmitter.prototype.removeListener.apply(this, args);
+
+  // TODO: we should take into consideration isGlobal.
+  if (!_this.listenerCount(evt)) {
+    _this.subClient.unsubscribe(evt);
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
