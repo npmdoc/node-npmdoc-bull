@@ -1,4 +1,4 @@
-<div class="apidocDiv">
+<html><head></head><body><div class="apidocDiv">
 <style>
 /*csslint
 */
@@ -47,17 +47,10 @@
 }
 </style>
 <h1>api documentation for
-    <a
-
-        href="https://github.com/OptimalBits/bull#readme"
-
-    >bull (v2.2.6)</a>
+    <a href="https://github.com/OptimalBits/bull#readme">bull (v2.2.6)</a>
 </h1>
 <h4>Job manager</h4>
-<div class="apidocSectionDiv"><a
-    href="#apidoc.tableOfContents"
-    id="apidoc.tableOfContents"
-><h1>table of contents</h1></a><ol>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
 
     <li class="apidocModuleLi"><a href="#apidoc.module.bull">module bull</a><ol>
 
@@ -1366,12 +1359,12 @@
     try {
       var redisUrl = url.parse(redisPort);
       assert(_.isObject(redisHost) || _.isUndefined(redisHost),
-          &#x27;Expected an object as redis option&#x27;);
+          'Expected an object as redis option');
       redisOptions =  redisHost || {};
       redisPort = redisUrl.port;
       redisHost = redisUrl.hostname;
       if (redisUrl.auth) {
-        redisOptions.password = redisUrl.auth.split(&#x27;:&#x27;)[1];
+        redisOptions.password = redisUrl.auth.split(':')[1];
       }
     } catch (e) {
       throw new Error(e.message);
@@ -1391,12 +1384,12 @@
   }
 
   redisPort = redisPort || 6379;
-  redisHost = redisHost || &#x27;127.0.0.1&#x27;;
+  redisHost = redisHost || '127.0.0.1';
 
   var _this = this;
 
   this.name = name;
-  this.keyPrefix = redisOptions.keyPrefix || &#x27;bull&#x27;;
+  this.keyPrefix = redisOptions.keyPrefix || 'bull';
 
   //
   // We cannot use ioredis keyPrefix feature until we
@@ -1407,14 +1400,14 @@
   //
   // Create queue client (used to add jobs, pause queues, etc);
   //
-  this.client = createClient(&#x27;client&#x27;);
+  this.client = createClient('client');
 
   getRedisVersion(this.client).then(function(version){
     if(semver.lt(version, MINIMUM_REDIS_VERSION)){
-      throw new Error(&#x27;Redis version needs to be greater than &#x27; + MINIMUM_REDIS_VERSION + &#x27;. Current: &#x27; + version);
+      throw new Error('Redis version needs to be greater than ' + MINIMUM_REDIS_VERSION + '. Current: ' + version);
     }
   }).catch(function(err){
-    _this.emit(&#x27;error&#x27;, err);
+    _this.emit('error', err);
   });
 
   //
@@ -1434,12 +1427,12 @@
   //
   // Create blocking client (used to wait for jobs)
   //
-  this.bclient = createClient(&#x27;block&#x27;);
+  this.bclient = createClient('block');
 
   //
   // Create event subscriber client (receive messages from other instance of the queue)
   //
-  this.eclient = createClient(&#x27;subscriber&#x27;);
+  this.eclient = createClient('subscriber');
 
   this.delayTimer = null;
   this.processing = 0;
@@ -1452,7 +1445,7 @@
 
   // bubble up Redis error events
   [this.client, this.bclient, this.eclient].forEach(function (client) {
-    client.on(&#x27;error&#x27;, _this.emit.bind(_this, &#x27;error&#x27;));
+    client.on('error', _this.emit.bind(_this, 'error'));
   });
 
   // keeps track of active timers. used by close() to
@@ -1463,21 +1456,21 @@
   // emit ready when redis connections ready
   var initializers = [this.client, this.bclient, this.eclient].map(function (client) {
     return new Promise(function(resolve, reject) {
-      client.once(&#x27;ready&#x27;, resolve);
-      client.once(&#x27;error&#x27;, reject);
+      client.once('ready', resolve);
+      client.once('error', reject);
     });
   });
 
   this._initializing = Promise.all(initializers).then(function(){
     return Promise.join(
-      _this.eclient.subscribe(_this.toKey(&#x27;delayed&#x27;)),
-      _this.eclient.subscribe(_this.toKey(&#x27;paused&#x27;))
+      _this.eclient.subscribe(_this.toKey('delayed')),
+      _this.eclient.subscribe(_this.toKey('paused'))
     );
   }).then(function(){
-    debuglog(name + &#x27; queue ready&#x27;);
-    _this.emit(&#x27;ready&#x27;);
+    debuglog(name + ' queue ready');
+    _this.emit('ready');
   }, function(err){
-    console.error(&#x27;Error initializing queue:&#x27;, err);
+    console.error('Error initializing queue:', err);
   });
 
   Disturbed.call(this, _this.client, _this.eclient);
@@ -1485,8 +1478,8 @@
   //
   // Listen distributed queue events
   //
-  listenDistEvent(&#x27;stalled&#x27;); //
-  listenDistEvent(&#x27;active&#x27;); //
+  listenDistEvent('stalled'); //
+  listenDistEvent('active'); //
   listenDist ...</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -1509,7 +1502,7 @@
   this.delay = opts.delay || 0;
   this.timestamp = opts.timestamp || Date.now();
   this.stacktrace = [];
-  if(this.opts.attempts &#x3e; 1){
+  if(this.opts.attempts &gt; 1){
     this.attempts = opts.attempts;
   }else{
     this.attempts = 1;
@@ -1534,8 +1527,8 @@
     return new PriorityQueue(name, redisPort, redisHost, redisOptions);
   }
 
-  console.warn(&#x22;DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
- option instead.&#x22;);
+  console.warn("DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
+ option instead.");
 
   var _this = this;
   this.paused = false;
@@ -1546,7 +1539,7 @@
     this.queues[PriorityQueue.priorities[key]] = queue;
   }
 
-  var groupEvents = [&#x27;ready&#x27;, &#x27;paused&#x27;, &#x27;resumed&#x27;]
+  var groupEvents = ['ready', 'paused', 'resumed']
   groupEvents.forEach(function(event) {
     Promise.map(_this.queues, function(queue) {
       return new Promise(function(resolve, reject) {
@@ -1555,7 +1548,7 @@
     }).then(_this.emit.bind(_this, event))
   })
 
-  var singleEvents = [&#x27;error&#x27;, &#x27;active&#x27;, &#x27;stalled&#x27;, &#x27;progress&#x27;, &#x27;completed&#x27;, &#x27;failed&#x27;, &#x27;cleaned&#x27;]
+  var singleEvents = ['error', 'active', 'stalled', 'progress', 'completed', 'failed', 'cleaned']
   singleEvents.forEach(function(event) {
     _this.queues.forEach(function(queue) {
       queue.on(event, _this.emit.bind(_this, event))
@@ -1595,12 +1588,12 @@
     try {
       var redisUrl = url.parse(redisPort);
       assert(_.isObject(redisHost) || _.isUndefined(redisHost),
-          &#x27;Expected an object as redis option&#x27;);
+          'Expected an object as redis option');
       redisOptions =  redisHost || {};
       redisPort = redisUrl.port;
       redisHost = redisUrl.hostname;
       if (redisUrl.auth) {
-        redisOptions.password = redisUrl.auth.split(&#x27;:&#x27;)[1];
+        redisOptions.password = redisUrl.auth.split(':')[1];
       }
     } catch (e) {
       throw new Error(e.message);
@@ -1620,12 +1613,12 @@
   }
 
   redisPort = redisPort || 6379;
-  redisHost = redisHost || &#x27;127.0.0.1&#x27;;
+  redisHost = redisHost || '127.0.0.1';
 
   var _this = this;
 
   this.name = name;
-  this.keyPrefix = redisOptions.keyPrefix || &#x27;bull&#x27;;
+  this.keyPrefix = redisOptions.keyPrefix || 'bull';
 
   //
   // We cannot use ioredis keyPrefix feature until we
@@ -1636,14 +1629,14 @@
   //
   // Create queue client (used to add jobs, pause queues, etc);
   //
-  this.client = createClient(&#x27;client&#x27;);
+  this.client = createClient('client');
 
   getRedisVersion(this.client).then(function(version){
     if(semver.lt(version, MINIMUM_REDIS_VERSION)){
-      throw new Error(&#x27;Redis version needs to be greater than &#x27; + MINIMUM_REDIS_VERSION + &#x27;. Current: &#x27; + version);
+      throw new Error('Redis version needs to be greater than ' + MINIMUM_REDIS_VERSION + '. Current: ' + version);
     }
   }).catch(function(err){
-    _this.emit(&#x27;error&#x27;, err);
+    _this.emit('error', err);
   });
 
   //
@@ -1663,12 +1656,12 @@
   //
   // Create blocking client (used to wait for jobs)
   //
-  this.bclient = createClient(&#x27;block&#x27;);
+  this.bclient = createClient('block');
 
   //
   // Create event subscriber client (receive messages from other instance of the queue)
   //
-  this.eclient = createClient(&#x27;subscriber&#x27;);
+  this.eclient = createClient('subscriber');
 
   this.delayTimer = null;
   this.processing = 0;
@@ -1681,7 +1674,7 @@
 
   // bubble up Redis error events
   [this.client, this.bclient, this.eclient].forEach(function (client) {
-    client.on(&#x27;error&#x27;, _this.emit.bind(_this, &#x27;error&#x27;));
+    client.on('error', _this.emit.bind(_this, 'error'));
   });
 
   // keeps track of active timers. used by close() to
@@ -1692,21 +1685,21 @@
   // emit ready when redis connections ready
   var initializers = [this.client, this.bclient, this.eclient].map(function (client) {
     return new Promise(function(resolve, reject) {
-      client.once(&#x27;ready&#x27;, resolve);
-      client.once(&#x27;error&#x27;, reject);
+      client.once('ready', resolve);
+      client.once('error', reject);
     });
   });
 
   this._initializing = Promise.all(initializers).then(function(){
     return Promise.join(
-      _this.eclient.subscribe(_this.toKey(&#x27;delayed&#x27;)),
-      _this.eclient.subscribe(_this.toKey(&#x27;paused&#x27;))
+      _this.eclient.subscribe(_this.toKey('delayed')),
+      _this.eclient.subscribe(_this.toKey('paused'))
     );
   }).then(function(){
-    debuglog(name + &#x27; queue ready&#x27;);
-    _this.emit(&#x27;ready&#x27;);
+    debuglog(name + ' queue ready');
+    _this.emit('ready');
   }, function(err){
-    console.error(&#x27;Error initializing queue:&#x27;, err);
+    console.error('Error initializing queue:', err);
   });
 
   Disturbed.call(this, _this.client, _this.eclient);
@@ -1714,8 +1707,8 @@
   //
   // Listen distributed queue events
   //
-  listenDistEvent(&#x27;stalled&#x27;); //
-  listenDistEvent(&#x27;active&#x27;); //
+  listenDistEvent('stalled'); //
+  listenDistEvent('active'); //
   listenDist ...</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -1737,7 +1730,7 @@
   this.pubClient = pubClient;
   this.subClient = subClient;
 
-  subClient.on(&#x27;message&#x27;, function (channel, msg) {
+  subClient.on('message', function (channel, msg) {
 
     var count = _this.listenerCount(channel);
     if (count) {
@@ -1745,7 +1738,7 @@
       try {
         args = JSON.parse(msg);
       } catch (err) {
-        console.error(&#x27;Parsing event message&#x27;, err);
+        console.error('Parsing event message', err);
       }
 
       if (args[0] !== _this.uuid) {
@@ -1810,7 +1803,7 @@
   this.delay = opts.delay || 0;
   this.timestamp = opts.timestamp || Date.now();
   this.stacktrace = [];
-  if(this.opts.attempts &#x3e; 1){
+  if(this.opts.attempts &gt; 1){
     this.attempts = opts.attempts;
   }else{
     this.attempts = 1;
@@ -1835,8 +1828,8 @@
 
   return addJob(queue, job).then(function(jobId){
     job.jobId = jobId;
-    queue.distEmit(&#x27;waiting&#x27;, job.toJSON());
-    debuglog(&#x27;Job added&#x27;, jobId);
+    queue.distEmit('waiting', job.toJSON());
+    debuglog('Job added', jobId);
     return job;
   });
 }</pre></li>
@@ -1880,7 +1873,7 @@
     job.returnvalue = JSON.parse(data.returnvalue);
   }catch (e){
     //swallow exception because the returnvalue got corrupted somehow.
-    debuglog(&#x27;corrupted returnvalue: &#x27; + data.returnvalue, e);
+    debuglog('corrupted returnvalue: ' + data.returnvalue, e);
   }
   return job;
 }</pre></li>
@@ -1933,7 +1926,7 @@ function status(resolve, reject){
     if(!completed){
       return _this.isFailed().then(function(failed){
         if(failed){
-          return Job.<span class="apidocCodeKeywordSpan">fromId</span>(_this.queue, _this.jobId, &#x27;failedReason&#x27;).then(
+          return Job.<span class="apidocCodeKeywordSpan">fromId</span>(_this.queue, _this.jobId, 'failedReason').then(
 function(data){
             reject(Error(data.failedReason));
             return true;
@@ -1980,7 +1973,7 @@ function(data){
     job.returnvalue = JSON.parse(json.returnvalue);
   }catch (e){
     //swallow exception because the returnvalue got corrupted somehow.
-    debuglog(&#x27;corrupted returnvalue: &#x27; + json.returnvalue, e);
+    debuglog('corrupted returnvalue: ' + json.returnvalue, e);
   }
   return job;
 }</pre></li>
@@ -2007,9 +2000,9 @@ function(data){
   if(this.opts.backoff){
     if(!isNaN(this.opts.backoff)){
       backoff = this.opts.backoff;
-    }else if(this.opts.backoff.type === &#x27;fixed&#x27;){
+    }else if(this.opts.backoff.type === 'fixed'){
       backoff = this.opts.backoff.delay;
-    }else if(this.opts.backoff.type === &#x27;exponential&#x27;){
+    }else if(this.opts.backoff.type === 'exponential'){
       delay = this.opts.backoff.delay;
       backoff = Math.round((Math.pow(2, this.attemptsMade) - 1) * delay);
     }
@@ -2022,7 +2015,7 @@ Job.prototype.moveToFailed = function(err){
 var _this = this;
 return this._saveAttempt(err).then(function() {
   // Check if an automatic retry should be performed
-  if(_this.attemptsMade &#x3c; _this.attempts &#x26;&#x26; !_this._discarded){
+  if(_this.attemptsMade &lt; _this.attempts &amp;&amp; !_this._discarded){
     // Check if backoff is needed
     var backoff = _this.<span class="apidocCodeKeywordSpan">_getBackOff</span>();
     if(backoff){
@@ -2052,17 +2045,17 @@ return this._saveAttempt(err).then(function() {
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
     } else if (result === -2) {
-      throw new Error(&#x27;Couldn\&#x27;t retry job: The job has been already retried or has not failed&#x27;);
+      throw new Error('Couldn\'t retry job: The job has been already retried or has not failed');
     }
   });
 };
 
 Job.prototype.isCompleted = function(){
-  return this.<span class="apidocCodeKeywordSpan">_isDone</span>(&#x27;completed&#x27;);
+  return this.<span class="apidocCodeKeywordSpan">_isDone</span>('completed');
 };
 
 Job.prototype.isFailed = function(){
-  return this._isDone(&#x27;failed&#x27;);
+  return this._isDone('failed');
 };
 
 Job.prototype.isDelayed = function() {
@@ -2083,17 +2076,17 @@ Job.prototype.isDelayed = function() {
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
   return this.queue.client
-    .zrank(this.queue.toKey(&#x27;delayed&#x27;), this.jobId).then(function(rank) {
+    .zrank(this.queue.toKey('delayed'), this.jobId).then(function(rank) {
       return rank !== null;
     });
 };
 
 Job.prototype.isActive = function() {
-  return this.<span class="apidocCodeKeywordSpan">_isInList</span>(&#x27;active&#x27;);
+  return this.<span class="apidocCodeKeywordSpan">_isInList</span>('active');
 };
 
 Job.prototype.isWaiting = function() {
-  return this._isInList(&#x27;wait&#x27;);
+  return this._isInList('wait');
 };
 
 Job.prototype.isPaused = function() {
@@ -2123,12 +2116,12 @@ Job.prototype.isPaused = function() {
       });
     }
     // If not, move to failed
-    return _this.<span class="apidocCodeKeywordSpan">_moveToSet</span>(&#x27;failed&#x27;);
+    return _this.<span class="apidocCodeKeywordSpan">_moveToSet</span>('failed');
   });
 };
 
 Job.prototype.moveToDelayed = function(timestamp){
-  return this._moveToSet(&#x27;delayed&#x27;, timestamp);
+  return this._moveToSet('delayed', timestamp);
 };
 ...</pre></li>
     </ul>
@@ -2147,20 +2140,20 @@ Job.prototype.moveToDelayed = function(timestamp){
   var jobId = this.jobId;
 
   var script = [
-    &#x27;if redis.call(&#x22;EXISTS&#x22;, KEYS[3]) == 1 then&#x27;,
-    &#x27; redis.call(&#x22;LREM&#x22;, KEYS[1], 0, ARGV[2])&#x27;,
-    &#x27; redis.call(ARGV[1], KEYS[2], ARGV[2])&#x27;,
-    &#x27; return 0&#x27;,
-    &#x27;else&#x27;,
-    &#x27; return -1&#x27;,
-    &#x27;end&#x27;
-  ].join(&#x27;\n&#x27;);
+    'if redis.call("EXISTS", KEYS[3]) == 1 then',
+    ' redis.call("LREM", KEYS[1], 0, ARGV[2])',
+    ' redis.call(ARGV[1], KEYS[2], ARGV[2])',
+    ' return 0',
+    'else',
+    ' return -1',
+    'end'
+  ].join('\n');
 
-  var keys = _.map([&#x27;active&#x27;, &#x27;wait&#x27;, jobId], function(name){
+  var keys = _.map(['active', 'wait', jobId], function(name){
     return queue.toKey(name);
   });
 
-  var pushCmd = (this.opts.lifo ? &#x27;R&#x27; : &#x27;L&#x27;) + &#x27;PUSH&#x27;;
+  var pushCmd = (this.opts.lifo ? 'R' : 'L') + 'PUSH';
 
   return queue.client.eval(
     script,
@@ -2171,7 +2164,7 @@ Job.prototype.moveToDelayed = function(timestamp){
     pushCmd,
     jobId).then(function(result){
       if(result === -1){
-        throw new Error(&#x27;Missing Job &#x27; + jobId + &#x27; during retry&#x27;);
+        throw new Error('Missing Job ' + jobId + ' during retry');
       }
     });
 }</pre></li>
@@ -2230,7 +2223,7 @@ Job.prototype.moveToFailed = function(err){
 var _this = this;
 return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(function() {
   // Check if an automatic retry should be performed
-  if(_this.attemptsMade &#x3c; _this.attempts &#x26;&#x26; !_this._discarded){
+  if(_this.attemptsMade &lt; _this.attempts &amp;&amp; !_this._discarded){
     // Check if backoff is needed
     var backoff = _this._getBackOff();
     if(backoff){
@@ -2251,7 +2244,7 @@ return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(fu
     <li>description and source-code<pre class="apidocCodePre">delayIfNeeded = function (){
   if(this.delay){
     var jobDelayedTimestamp = this.timestamp + this.delay;
-    if(jobDelayedTimestamp &#x3e; Date.now()){
+    if(jobDelayedTimestamp &gt; Date.now()){
       return this.moveToDelayed(jobDelayedTimestamp).then(function(){
         return true;
       });
@@ -2294,7 +2287,7 @@ return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(fu
       if(!completed){
         return _this.isFailed().then(function(failed){
           if(failed){
-            return Job.fromId(_this.queue, _this.jobId, &#x27;failedReason&#x27;).then(function(data){
+            return Job.fromId(_this.queue, _this.jobId, 'failedReason').then(function(data){
               reject(Error(data.failedReason));
               return true;
             });
@@ -2327,12 +2320,12 @@ return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(fu
         }
 
         function removeListeners(){
-          _this.queue.removeListener(&#x27;completed&#x27;, onCompleted);
-          _this.queue.removeListener(&#x27;failed&#x27;, onFailed);
+          _this.queue.removeListener('completed', onCompleted);
+          _this.queue.removeListener('failed', onFailed);
         }
 
-        _this.queue.on(&#x27;completed&#x27;, onCompleted);
-        _this.queue.on(&#x27;failed&#x27;, onFailed);
+        _this.queue.on('completed', onCompleted);
+        _this.queue.on('failed', onFailed);
 
         //
         // Watchdog
@@ -2364,12 +2357,12 @@ return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(fu
     <li>description and source-code<pre class="apidocCodePre">getState = function () {
   var _this = this;
   var fns = [
-    { fn: &#x27;isCompleted&#x27;, state: &#x27;completed&#x27; },
-    { fn: &#x27;isFailed&#x27;, state: &#x27;failed&#x27; },
-    { fn: &#x27;isDelayed&#x27;, state: &#x27;delayed&#x27; },
-    { fn: &#x27;isActive&#x27;, state: &#x27;active&#x27; },
-    { fn: &#x27;isWaiting&#x27;, state: &#x27;waiting&#x27; },
-    { fn: &#x27;isPaused&#x27;, state: &#x27;paused&#x27; }
+    { fn: 'isCompleted', state: 'completed' },
+    { fn: 'isFailed', state: 'failed' },
+    { fn: 'isDelayed', state: 'delayed' },
+    { fn: 'isActive', state: 'active' },
+    { fn: 'isWaiting', state: 'waiting' },
+    { fn: 'isPaused', state: 'paused' }
   ];
 
   return Promise.reduce(fns, function(state, fn) {
@@ -2380,19 +2373,19 @@ return this.<span class="apidocCodeKeywordSpan">_saveAttempt</span>(err).then(fu
       return result ? fn.state : null;
     });
   }, null).then(function(result) {
-    return result ? result : &#x27;stuck&#x27;;
+    return result ? result : 'stuck';
   });
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 };
 
 Job.prototype.isPaused = function() {
-return this._isInList(&#x27;paused&#x27;);
+return this._isInList('paused');
 };
 
 Job.prototype.isStuck = function() {
 return this.<span class="apidocCodeKeywordSpan">getState</span>().then(function(state) {
-  return state === &#x27;stuck&#x27;;
+  return state === 'stuck';
 });
 };
 
@@ -2412,7 +2405,7 @@ var fns = [
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isActive = function () {
-  return this._isInList(&#x27;active&#x27;);
+  return this._isInList('active');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -2427,7 +2420,7 @@ var fns = [
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isCompleted = function (){
-  return this._isDone(&#x27;completed&#x27;);
+  return this._isDone('completed');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
  * TODO: Add a watchdog to check if the job has finished periodically.
@@ -2441,7 +2434,7 @@ function status(resolve, reject){
     if(!completed){
       return _this.isFailed().then(function(failed){
         if(failed){
-          return Job.fromId(_this.queue, _this.jobId, &#x27;failedReason&#x27;).then(function(data){
+          return Job.fromId(_this.queue, _this.jobId, 'failedReason').then(function(data){
             reject(Error(data.failedReason));
             return true;
           });
@@ -2459,7 +2452,7 @@ function status(resolve, reject){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isDelayed = function () {
   return this.queue.client
-    .zrank(this.queue.toKey(&#x27;delayed&#x27;), this.jobId).then(function(rank) {
+    .zrank(this.queue.toKey('delayed'), this.jobId).then(function(rank) {
       return rank !== null;
     });
 }</pre></li>
@@ -2476,7 +2469,7 @@ function status(resolve, reject){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isFailed = function (){
-  return this._isDone(&#x27;failed&#x27;);
+  return this._isDone('failed');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
  */
@@ -2488,7 +2481,7 @@ function status(resolve, reject){
     if(!completed){
       return _this.<span class="apidocCodeKeywordSpan">isFailed</span>().then(function(failed){
         if(failed){
-          return Job.fromId(_this.queue, _this.jobId, &#x27;failedReason&#x27;).then(function(data){
+          return Job.fromId(_this.queue, _this.jobId, 'failedReason').then(function(data){
             reject(Error(data.failedReason));
             return true;
           });
@@ -2507,7 +2500,7 @@ function status(resolve, reject){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isPaused = function () {
-  return this._isInList(&#x27;paused&#x27;);
+  return this._isInList('paused');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -2523,7 +2516,7 @@ function status(resolve, reject){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isStuck = function () {
   return this.getState().then(function(state) {
-    return state === &#x27;stuck&#x27;;
+    return state === 'stuck';
   });
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
@@ -2539,7 +2532,7 @@ function status(resolve, reject){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isWaiting = function () {
-  return this._isInList(&#x27;wait&#x27;);
+  return this._isInList('wait');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -2554,7 +2547,7 @@ function status(resolve, reject){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">lockKey = function (){
-  return this.queue.toKey(this.jobId) + &#x27;:lock&#x27;;
+  return this.queue.toKey(this.jobId) + ':lock';
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
     extraLockArgs: [job.jobId]
@@ -2568,7 +2561,7 @@ return redlock.lock(job.<span class="apidocCodeKeywordSpan">lockKey</span>(), qu
   //
   // Failing to lock due to already locked is not an error.
   //
-  if(err.name != &#x27;LockError&#x27;){
+  if(err.name != 'LockError'){
     throw err;
   }
 });
@@ -2585,7 +2578,7 @@ return redlock.lock(job.<span class="apidocCodeKeywordSpan">lockKey</span>(), qu
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">move = function (src, target, returnValue){
-  if(target === &#x27;completed&#x27;){
+  if(target === 'completed'){
     this.returnvalue = returnValue || 0;
     if(this.opts.removeOnComplete){
       target = void 0;
@@ -2595,7 +2588,7 @@ return redlock.lock(job.<span class="apidocCodeKeywordSpan">lockKey</span>(), qu
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 Job.prototype.move = function(src, target, returnValue){
-  if(target === &#x27;completed&#x27;){
+  if(target === 'completed'){
     this.returnvalue = returnValue || 0;
     if(this.opts.removeOnComplete){
       target = void 0;
@@ -2637,7 +2630,7 @@ return scripts.<span class="apidocCodeKeywordSpan">moveToCompleted</span>(this, 
 };
 
 Job.prototype.move = function(src, target, returnValue){
-if(target === &#x27;completed&#x27;){
+if(target === 'completed'){
   this.returnvalue = returnValue || 0;
   if(this.opts.removeOnComplete){
     target = void 0;
@@ -2654,7 +2647,7 @@ if(target === &#x27;completed&#x27;){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">moveToDelayed = function (timestamp){
-  return this._moveToSet(&#x27;delayed&#x27;, timestamp);
+  return this._moveToSet('delayed', timestamp);
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
   .then(function() { _this.lock = null; });
@@ -2663,7 +2656,7 @@ if(target === &#x27;completed&#x27;){
 Job.prototype.delayIfNeeded = function(){
   if(this.delay){
     var jobDelayedTimestamp = this.timestamp + this.delay;
-    if(jobDelayedTimestamp &#x3e; Date.now()){
+    if(jobDelayedTimestamp &gt; Date.now()){
       return this.<span class="apidocCodeKeywordSpan">moveToDelayed</span>(jobDelayedTimestamp).then(function(){
         return true;
       });
@@ -2687,7 +2680,7 @@ Job.prototype.delayIfNeeded = function(){
   var _this = this;
   return this._saveAttempt(err).then(function() {
     // Check if an automatic retry should be performed
-    if(_this.attemptsMade &#x3c; _this.attempts &#x26;&#x26; !_this._discarded){
+    if(_this.attemptsMade &lt; _this.attempts &amp;&amp; !_this._discarded){
       // Check if backoff is needed
       var backoff = _this._getBackOff();
       if(backoff){
@@ -2703,7 +2696,7 @@ Job.prototype.delayIfNeeded = function(){
       });
     }
     // If not, move to failed
-    return _this._moveToSet(&#x27;failed&#x27;);
+    return _this._moveToSet('failed');
   });
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
@@ -2722,8 +2715,8 @@ Job.prototype.delayIfNeeded = function(){
   if(progress){
     var _this = this;
     this._progress = progress;
-    return this.queue.client.hset(this.queue.toKey(this.jobId), &#x27;progress&#x27;, progress).then(function(){
-      _this.queue.distEmit(&#x27;progress&#x27;, _this.toJSON(), progress);
+    return this.queue.client.hset(this.queue.toKey(this.jobId), 'progress', progress).then(function(){
+      _this.queue.distEmit('progress', _this.toJSON(), progress);
     });
   }else{
     return this._progress;
@@ -2743,7 +2736,7 @@ job.<span class="apidocCodeKeywordSpan">progress</span>(42);
 done();
 
 // or give a error if error
-done(Error(&#x27;error transcoding&#x27;));
+done(Error('error transcoding'));
 ...</pre></li>
     </ul>
 
@@ -2761,15 +2754,15 @@ done(Error(&#x27;error transcoding&#x27;));
   var jobId = this.jobId;
 
   var script = [
-    &#x27;if redis.call(&#x22;ZREM&#x22;, KEYS[1], ARGV[1]) == 1 then&#x27;,
-    &#x27; redis.call(&#x22;LPUSH&#x22;, KEYS[2], ARGV[1])&#x27;,
-    &#x27; return 0&#x27;,
-    &#x27;else&#x27;,
-    &#x27; return -1&#x27;,
-    &#x27;end&#x27;
-  ].join(&#x27;\n&#x27;);
+    'if redis.call("ZREM", KEYS[1], ARGV[1]) == 1 then',
+    ' redis.call("LPUSH", KEYS[2], ARGV[1])',
+    ' return 0',
+    'else',
+    ' return -1',
+    'end'
+  ].join('\n');
 
-  var keys = _.map([&#x27;delayed&#x27;, &#x27;wait&#x27;], function(name){
+  var keys = _.map(['delayed', 'wait'], function(name){
     return queue.toKey(name);
   });
 
@@ -2780,7 +2773,7 @@ done(Error(&#x27;error transcoding&#x27;));
     keys[1],
     jobId).then(function(result){
       if(result === -1){
-        throw new Error(&#x27;Job &#x27; + jobId + &#x27; is not in a delayed state&#x27;);
+        throw new Error('Job ' + jobId + ' is not in a delayed state');
       }
     });
 }</pre></li>
@@ -2816,7 +2809,7 @@ return scripts.<span class="apidocCodeKeywordSpan">releaseLock</span>(this)
 Job.prototype.delayIfNeeded = function(){
 if(this.delay){
   var jobDelayedTimestamp = this.timestamp + this.delay;
-  if(jobDelayedTimestamp &#x3e; Date.now()){
+  if(jobDelayedTimestamp &gt; Date.now()){
 ...</pre></li>
     </ul>
 
@@ -2835,11 +2828,11 @@ if(this.delay){
 
   return job.takeLock().then(function(lock) {
     if (!lock) {
-      throw new Error(&#x27;Could not get lock for job: &#x27; + job.jobId + &#x27;. Cannot remove job.&#x27;);
+      throw new Error('Could not get lock for job: ' + job.jobId + '. Cannot remove job.');
     }
     return scripts.remove(queue, job.jobId)
       .then(function() {
-        queue.emit(&#x27;removed&#x27;, job.toJSON());
+        queue.emit('removed', job.toJSON());
       })
       .finally(function () {
         return job.releaseLock();
@@ -2858,7 +2851,7 @@ if(this.delay){
       });
     }
     // If not, move to failed
-    return _this._moveToSet(&#x27;failed&#x27;);
+    return _this._moveToSet('failed');
   });
 };
 ...</pre></li>
@@ -2891,15 +2884,15 @@ if(this.delay){
     <li>description and source-code<pre class="apidocCodePre">retry = function (){
   var queue = this.queue;
   var _this = this;
-  return scripts.reprocessJob(this, { state: &#x27;failed&#x27; }).then(function(result) {
+  return scripts.reprocessJob(this, { state: 'failed' }).then(function(result) {
     if (result === 1) {
-      queue.emit(&#x27;waiting&#x27;, _this);
+      queue.emit('waiting', _this);
     } else if (result === 0) {
-      throw new Error(&#x27;Couldn\&#x27;t retry job: The job doesn\&#x27;t exist&#x27;);
+      throw new Error('Couldn\'t retry job: The job doesn\'t exist');
     } else if (result === -1) {
-      throw new Error(&#x27;Couldn\&#x27;t retry job: The job is locked&#x27;);
+      throw new Error('Couldn\'t retry job: The job is locked');
     } else if (result === -2) {
-      throw new Error(&#x27;Couldn\&#x27;t retry job: The job has been already retried or has not failed&#x27;);
+      throw new Error('Couldn\'t retry job: The job has been already retried or has not failed');
     }
   });
 }</pre></li>
@@ -3018,8 +3011,8 @@ var job = new Job(queue, data, opts);
 
 return addJob(queue, job).then(function(jobId){
   job.jobId = jobId;
-  queue.distEmit(&#x27;waiting&#x27;, job.<span class="apidocCodeKeywordSpan">toJSON</span>());
-  debuglog(&#x27;Job added&#x27;, jobId);
+  queue.distEmit('waiting', job.<span class="apidocCodeKeywordSpan">toJSON</span>());
+  debuglog('Job added', jobId);
   return job;
 });
 };
@@ -3048,8 +3041,8 @@ Job.fromId = function(queue, jobId){
     return new PriorityQueue(name, redisPort, redisHost, redisOptions);
   }
 
-  console.warn(&#x22;DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
- option instead.&#x22;);
+  console.warn("DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
+ option instead.");
 
   var _this = this;
   this.paused = false;
@@ -3060,7 +3053,7 @@ Job.fromId = function(queue, jobId){
     this.queues[PriorityQueue.priorities[key]] = queue;
   }
 
-  var groupEvents = [&#x27;ready&#x27;, &#x27;paused&#x27;, &#x27;resumed&#x27;]
+  var groupEvents = ['ready', 'paused', 'resumed']
   groupEvents.forEach(function(event) {
     Promise.map(_this.queues, function(queue) {
       return new Promise(function(resolve, reject) {
@@ -3069,7 +3062,7 @@ Job.fromId = function(queue, jobId){
     }).then(_this.emit.bind(_this, event))
   })
 
-  var singleEvents = [&#x27;error&#x27;, &#x27;active&#x27;, &#x27;stalled&#x27;, &#x27;progress&#x27;, &#x27;completed&#x27;, &#x27;failed&#x27;, &#x27;cleaned&#x27;]
+  var singleEvents = ['error', 'active', 'stalled', 'progress', 'completed', 'failed', 'cleaned']
   singleEvents.forEach(function(event) {
     _this.queues.forEach(function(queue) {
       queue.on(event, _this.emit.bind(_this, event))
@@ -3112,12 +3105,12 @@ Job.fromId = function(queue, jobId){
   }
 }
 
-PriorityQueue.prototype.getWaiting = PriorityQueue.<span class="apidocCodeKeywordSpan">genericGetter</span>(&#x22;getWaiting&#x22
+PriorityQueue.prototype.getWaiting = PriorityQueue.<span class="apidocCodeKeywordSpan">genericGetter</span>("getWaiting"
 ;);
-PriorityQueue.prototype.getActive = PriorityQueue.genericGetter(&#x22;getActive&#x22;);
-PriorityQueue.prototype.getDelayed = PriorityQueue.genericGetter(&#x22;getDelayed&#x22;);
-PriorityQueue.prototype.getCompleted = PriorityQueue.genericGetter(&#x22;getCompleted&#x22;);
-PriorityQueue.prototype.getFailed = PriorityQueue.genericGetter(&#x22;getFailed&#x22;);
+PriorityQueue.prototype.getActive = PriorityQueue.genericGetter("getActive");
+PriorityQueue.prototype.getDelayed = PriorityQueue.genericGetter("getDelayed");
+PriorityQueue.prototype.getCompleted = PriorityQueue.genericGetter("getCompleted");
+PriorityQueue.prototype.getFailed = PriorityQueue.genericGetter("getFailed");
 
 
 // ---------------------------------------------------------------------
@@ -3134,11 +3127,11 @@ PriorityQueue.prototype.getFailed = PriorityQueue.genericGetter(&#x22;getFailed&
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getQueueName = function (name, priority) {
-  return name + &#x27;:prio:&#x27; + priority;
+  return name + ':prio:' + priority;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-console.warn(&#x22;DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
- option instead.&#x22;);
+console.warn("DEPRECATION NOTICE: PriorityQueue has been deprecated and will be removed in bull 3.0.0, please use the priority
+ option instead.");
 
 var _this = this;
 this.paused = false;
@@ -3150,7 +3143,7 @@ for (var key in PriorityQueue.priorities) {
   this.queues[PriorityQueue.priorities[key]] = queue;
 }
 
-var groupEvents = [&#x27;ready&#x27;, &#x27;paused&#x27;, &#x27;resumed&#x27;]
+var groupEvents = ['ready', 'paused', 'resumed']
 groupEvents.forEach(function(event) {
   Promise.map(_this.queues, function(queue) {
     return new Promise(function(resolve, reject) {
@@ -3189,7 +3182,7 @@ groupEvents.forEach(function(event) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">add = function (data, opts) {
-  return this.getQueue(opts &#x26;&#x26; opts.priority).add(data, opts);
+  return this.getQueue(opts &amp;&amp; opts.priority).add(data, opts);
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 });
@@ -3199,9 +3192,9 @@ pdfQueue.process(function(job){
   return pdfAsyncProcessor();
 });
 
-videoQueue.<span class="apidocCodeKeywordSpan">add</span>({video: &#x27;http://example.com/video1.mov&#x27;});
-audioQueue.add({audio: &#x27;http://example.com/audio1.mp3&#x27;});
-imageQueue.add({image: &#x27;http://example.com/image1.tiff&#x27;});
+videoQueue.<span class="apidocCodeKeywordSpan">add</span>({video: 'http://example.com/video1.mov'});
+audioQueue.add({audio: 'http://example.com/audio1.mp3'});
+imageQueue.add({image: 'http://example.com/image1.tiff'});
 ```
 
 Alternatively, you can use return promises instead of using the `done` callback:
@@ -3225,8 +3218,8 @@ Alternatively, you can use return promises instead of using the `done` callback:
     return queue.clean(grace, type);
   }).then(function (results) {
     var jobs = [].concat.apply([], results);
-    var tp = type || &#x27;completed&#x27;;
-    _this.emit(&#x27;cleaned&#x27;, jobs, tp);
+    var tp = type || 'completed';
+    _this.emit('cleaned', jobs, tp);
     return Promise.resolve(jobs);
   });
 }</pre></li>
@@ -3240,9 +3233,9 @@ __Example__
 //cleans all jobs that completed over 5 seconds ago.
 queue.<span class="apidocCodeKeywordSpan">clean</span>(5000);
 //clean all jobs that failed over 10 seconds ago.
-queue.clean(10000, &#x27;failed&#x27;);
-queue.on(&#x27;cleaned&#x27;, function (job, type) {
-  console.log(&#x27;Cleaned %s %s jobs&#x27;, job.length, type);
+queue.clean(10000, 'failed');
+queue.on('cleaned', function (job, type) {
+  console.log('Cleaned %s %s jobs', job.length, type);
 });
 ```
 ...</pre></li>
@@ -3266,18 +3259,18 @@ queue.on(&#x27;cleaned&#x27;, function (job, type) {
 shutdown.
 
 ```javascript
-var Queue = require(&#x27;bull&#x27;);
-var queue = Queue(&#x27;example&#x27;);
+var Queue = require('bull');
+var queue = Queue('example');
 
 var after100 = _.after(100, function () {
-  queue.<span class="apidocCodeKeywordSpan">close</span>().then(function () { console.log(&#x27;done&#x27;) })
+  queue.<span class="apidocCodeKeywordSpan">close</span>().then(function () { console.log('done') })
 });
 
-queue.on(&#x27;completed&#x27;, after100);
+queue.on('completed', after100);
 ```
 
 `close` can be called from anywhere, with one caveat: if called
-from within a job handler the queue won&#x27;t close until *after*
+from within a job handler the queue won't close until *after*
 ...</pre></li>
     </ul>
 
@@ -3370,7 +3363,7 @@ return this.closing = Promise.map(this.queues, function(queue) {
     <li>example usage<pre class="apidocCodePre">...
 
 PriorityQueue.prototype.add = function(data, opts) {
-return this.getQueue(opts &#x26;&#x26; opts.priority).add(data, opts);
+return this.getQueue(opts &amp;&amp; opts.priority).add(data, opts);
 }
 
 PriorityQueue.prototype.empty = function() {
@@ -3494,7 +3487,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     <li>description and source-code<pre class="apidocCodePre">getQueue = function (priority) {
   if (!(priority in PriorityQueue.priorities)) {
     //in case of unknown priority, we use normal
-    priority = &#x22;normal&#x22;;
+    priority = "normal";
   }
 
   var queue = this.queues[PriorityQueue.priorities[priority]];
@@ -3508,7 +3501,7 @@ PriorityQueue.prototype.setLockRenewTime = function(lockRenewTime) {
 }
 
 PriorityQueue.prototype.add = function(data, opts) {
-  return this.<span class="apidocCodeKeywordSpan">getQueue</span>(opts &#x26;&#x26; opts.priority).add(data, opts);
+  return this.<span class="apidocCodeKeywordSpan">getQueue</span>(opts &amp;&amp; opts.priority).add(data, opts);
 }
 
 PriorityQueue.prototype.empty = function() {
@@ -3557,12 +3550,12 @@ PriorityQueue.prototype.empty = function() {
 
   _this.paused = Promise.map(this.queues, function(queue) {
     return queue.pause(localOnly || false);
-  }).then(_this.emit.bind(_this, &#x27;paused&#x27;));
+  }).then(_this.emit.bind(_this, 'paused'));
 
   return _this.paused;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-  return Promise.reject(new Error(&#x27;some unexpected error&#x27;));
+  return Promise.reject(new Error('some unexpected error'));
 });
 ```
 
@@ -3597,12 +3590,12 @@ queue.resume().then(function(){
   return this.run();
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-var Queue = require(&#x27;bull&#x27;);
+var Queue = require('bull');
 
-var videoQueue = Queue(&#x27;video transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var audioQueue = Queue(&#x27;audio transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var imageQueue = Queue(&#x27;image transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var pdfQueue = Queue(&#x27;pdf transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
+var videoQueue = Queue('video transcoding', 6379, '127.0.0.1');
+var audioQueue = Queue('audio transcoding', 6379, '127.0.0.1');
+var imageQueue = Queue('image transcoding', 6379, '127.0.0.1');
+var pdfQueue = Queue('pdf transcoding', 6379, '127.0.0.1');
 
 videoQueue.<span class="apidocCodeKeywordSpan">process</span>(function(job, done){
 
@@ -3628,7 +3621,7 @@ job.progress(42);
   _this.paused = false;
   return Promise.map(this.queues, function(queue) {
     return queue.resume(localOnly || false);
-  }).then(_this.emit.bind(_this, &#x27;resumed&#x27;)).then(function() {
+  }).then(_this.emit.bind(_this, 'resumed')).then(function() {
     if (_this.handler) {
       _this.run();
     }
@@ -3649,7 +3642,7 @@ queue.<span class="apidocCodeKeywordSpan">resume</span>().then(function(){
 
 A queue emits also some useful events:
 ```javascript
-.on(&#x27;ready&#x27;, function() {
+.on('ready', function() {
 ...</pre></li>
     </ul>
 
@@ -3678,8 +3671,8 @@ A queue emits also some useful events:
         return _this.closing;
       }
 
-      // the index is reversed to the actual priority number (0 is &#x27;critical&#x27;)
-      // so flip it to get the correct &#x22;priority index&#x22;
+      // the index is reversed to the actual priority number (0 is 'critical')
+      // so flip it to get the correct "priority index"
       var nbJobsToProcess = _this.strategy(PriorityQueue.priorities.critical - index);
       var i = 0;
 
@@ -3691,7 +3684,7 @@ A queue emits also some useful events:
             if (job) {
               emptyLoop = false;
               return queue.processJob(job).then(function() {
-                if (++i &#x3c; nbJobsToProcess &#x26;&#x26; !_this.paused) {
+                if (++i &lt; nbJobsToProcess &amp;&amp; !_this.paused) {
                   return fn();
                 }
               })
@@ -3782,12 +3775,12 @@ var _this = this;
     try {
       var redisUrl = url.parse(redisPort);
       assert(_.isObject(redisHost) || _.isUndefined(redisHost),
-          &#x27;Expected an object as redis option&#x27;);
+          'Expected an object as redis option');
       redisOptions =  redisHost || {};
       redisPort = redisUrl.port;
       redisHost = redisUrl.hostname;
       if (redisUrl.auth) {
-        redisOptions.password = redisUrl.auth.split(&#x27;:&#x27;)[1];
+        redisOptions.password = redisUrl.auth.split(':')[1];
       }
     } catch (e) {
       throw new Error(e.message);
@@ -3807,12 +3800,12 @@ var _this = this;
   }
 
   redisPort = redisPort || 6379;
-  redisHost = redisHost || &#x27;127.0.0.1&#x27;;
+  redisHost = redisHost || '127.0.0.1';
 
   var _this = this;
 
   this.name = name;
-  this.keyPrefix = redisOptions.keyPrefix || &#x27;bull&#x27;;
+  this.keyPrefix = redisOptions.keyPrefix || 'bull';
 
   //
   // We cannot use ioredis keyPrefix feature until we
@@ -3823,14 +3816,14 @@ var _this = this;
   //
   // Create queue client (used to add jobs, pause queues, etc);
   //
-  this.client = createClient(&#x27;client&#x27;);
+  this.client = createClient('client');
 
   getRedisVersion(this.client).then(function(version){
     if(semver.lt(version, MINIMUM_REDIS_VERSION)){
-      throw new Error(&#x27;Redis version needs to be greater than &#x27; + MINIMUM_REDIS_VERSION + &#x27;. Current: &#x27; + version);
+      throw new Error('Redis version needs to be greater than ' + MINIMUM_REDIS_VERSION + '. Current: ' + version);
     }
   }).catch(function(err){
-    _this.emit(&#x27;error&#x27;, err);
+    _this.emit('error', err);
   });
 
   //
@@ -3850,12 +3843,12 @@ var _this = this;
   //
   // Create blocking client (used to wait for jobs)
   //
-  this.bclient = createClient(&#x27;block&#x27;);
+  this.bclient = createClient('block');
 
   //
   // Create event subscriber client (receive messages from other instance of the queue)
   //
-  this.eclient = createClient(&#x27;subscriber&#x27;);
+  this.eclient = createClient('subscriber');
 
   this.delayTimer = null;
   this.processing = 0;
@@ -3868,7 +3861,7 @@ var _this = this;
 
   // bubble up Redis error events
   [this.client, this.bclient, this.eclient].forEach(function (client) {
-    client.on(&#x27;error&#x27;, _this.emit.bind(_this, &#x27;error&#x27;));
+    client.on('error', _this.emit.bind(_this, 'error'));
   });
 
   // keeps track of active timers. used by close() to
@@ -3879,21 +3872,21 @@ var _this = this;
   // emit ready when redis connections ready
   var initializers = [this.client, this.bclient, this.eclient].map(function (client) {
     return new Promise(function(resolve, reject) {
-      client.once(&#x27;ready&#x27;, resolve);
-      client.once(&#x27;error&#x27;, reject);
+      client.once('ready', resolve);
+      client.once('error', reject);
     });
   });
 
   this._initializing = Promise.all(initializers).then(function(){
     return Promise.join(
-      _this.eclient.subscribe(_this.toKey(&#x27;delayed&#x27;)),
-      _this.eclient.subscribe(_this.toKey(&#x27;paused&#x27;))
+      _this.eclient.subscribe(_this.toKey('delayed')),
+      _this.eclient.subscribe(_this.toKey('paused'))
     );
   }).then(function(){
-    debuglog(name + &#x27; queue ready&#x27;);
-    _this.emit(&#x27;ready&#x27;);
+    debuglog(name + ' queue ready');
+    _this.emit('ready');
   }, function(err){
-    console.error(&#x27;Error initializing queue:&#x27;, err);
+    console.error('Error initializing queue:', err);
   });
 
   Disturbed.call(this, _this.client, _this.eclient);
@@ -3901,8 +3894,8 @@ var _this = this;
   //
   // Listen distributed queue events
   //
-  listenDistEvent(&#x27;stalled&#x27;); //
-  listenDistEvent(&#x27;active&#x27;); //
+  listenDistEvent('stalled'); //
+  listenDistEvent('active'); //
   listenDist ...</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -3924,7 +3917,7 @@ var _this = this;
   this.pubClient = pubClient;
   this.subClient = subClient;
 
-  subClient.on(&#x27;message&#x27;, function (channel, msg) {
+  subClient.on('message', function (channel, msg) {
 
     var count = _this.listenerCount(channel);
     if (count) {
@@ -3932,7 +3925,7 @@ var _this = this;
       try {
         args = JSON.parse(msg);
       } catch (err) {
-        console.error(&#x27;Parsing event message&#x27;, err);
+        console.error('Parsing event message', err);
       }
 
       if (args[0] !== _this.uuid) {
@@ -3970,9 +3963,9 @@ pdfQueue.process(function(job){
   return pdfAsyncProcessor();
 });
 
-videoQueue.<span class="apidocCodeKeywordSpan">add</span>({video: &#x27;http://example.com/video1.mov&#x27;});
-audioQueue.add({audio: &#x27;http://example.com/audio1.mp3&#x27;});
-imageQueue.add({image: &#x27;http://example.com/image1.tiff&#x27;});
+videoQueue.<span class="apidocCodeKeywordSpan">add</span>({video: 'http://example.com/video1.mov'});
+audioQueue.add({audio: 'http://example.com/audio1.mp3'});
+imageQueue.add({image: 'http://example.com/image1.tiff'});
 ```
 
 Alternatively, you can use return promises instead of using the `done` callback:
@@ -3995,28 +3988,28 @@ Alternatively, you can use return promises instead of using the `done` callback:
 
   return new Promise(function (resolve, reject) {
     if(grace === undefined || grace === null) {
-      return reject(new Error(&#x27;You must define a grace period.&#x27;));
+      return reject(new Error('You must define a grace period.'));
     }
 
     if(!type) {
-      type = &#x27;completed&#x27;;
+      type = 'completed';
     }
 
     if(_.indexOf([
-      &#x27;completed&#x27;,
-      &#x27;wait&#x27;,
-      &#x27;active&#x27;,
-      &#x27;delayed&#x27;,
-      &#x27;failed&#x27;], type) === -1){
-      return reject(new Error(&#x27;Cannot clean unkown queue type&#x27;));
+      'completed',
+      'wait',
+      'active',
+      'delayed',
+      'failed'], type) === -1){
+      return reject(new Error('Cannot clean unkown queue type'));
     }
 
     return scripts.cleanJobsInSet(_this, type, Date.now() - grace, limit).then(function (jobs) {
-      _this.distEmit(&#x27;cleaned&#x27;, jobs, type);
+      _this.distEmit('cleaned', jobs, type);
       resolve(jobs);
       return null;
     }).catch(function (err) {
-      _this.emit(&#x27;error&#x27;, err);
+      _this.emit('error', err);
       reject(err);
     });
   });
@@ -4031,9 +4024,9 @@ __Example__
 //cleans all jobs that completed over 5 seconds ago.
 queue.<span class="apidocCodeKeywordSpan">clean</span>(5000);
 //clean all jobs that failed over 10 seconds ago.
-queue.clean(10000, &#x27;failed&#x27;);
-queue.on(&#x27;cleaned&#x27;, function (job, type) {
-  console.log(&#x27;Cleaned %s %s jobs&#x27;, job.length, type);
+queue.clean(10000, 'failed');
+queue.on('cleaned', function (job, type) {
+  console.log('Cleaned %s %s jobs', job.length, type);
 });
 ```
 ...</pre></li>
@@ -4075,18 +4068,18 @@ queue.on(&#x27;cleaned&#x27;, function (job, type) {
 shutdown.
 
 ```javascript
-var Queue = require(&#x27;bull&#x27;);
-var queue = Queue(&#x27;example&#x27;);
+var Queue = require('bull');
+var queue = Queue('example');
 
 var after100 = _.after(100, function () {
-  queue.<span class="apidocCodeKeywordSpan">close</span>().then(function () { console.log(&#x27;done&#x27;) })
+  queue.<span class="apidocCodeKeywordSpan">close</span>().then(function () { console.log('done') })
 });
 
-queue.on(&#x27;completed&#x27;, after100);
+queue.on('completed', after100);
 ```
 
 `close` can be called from anywhere, with one caveat: if called
-from within a job handler the queue won&#x27;t close until *after*
+from within a job handler the queue won't close until *after*
 ...</pre></li>
     </ul>
 
@@ -4101,9 +4094,9 @@ from within a job handler the queue won&#x27;t close until *after*
     <ul>
     <li>description and source-code<pre class="apidocCodePre">count = function (){
   var multi = this.multi();
-  multi.llen(this.toKey(&#x27;wait&#x27;));
-  multi.llen(this.toKey(&#x27;paused&#x27;));
-  multi.zcard(this.toKey(&#x27;delayed&#x27;));
+  multi.llen(this.toKey('wait'));
+  multi.llen(this.toKey('paused'));
+  multi.zcard(this.toKey('delayed'));
 
   return multi.exec().then(function(res){
     return Math.max(res[0][1], res[1][1]) + res[2][1];
@@ -4141,11 +4134,11 @@ return Promise.map(this.queues, function(queue) {
   var _this = this;
 
   function endClients(){
-    var timeoutMsg = &#x27;Timed out while waiting for redis clients to close&#x27;;
+    var timeoutMsg = 'Timed out while waiting for redis clients to close';
 
     return new Promise(function(resolve) {
       _this.bclient.end(true);
-      _this.bclient.stream.once(&#x27;close&#x27;, resolve);
+      _this.bclient.stream.once('close', resolve);
     }).timeout(CLIENT_CLOSE_TIMEOUT_MS, timeoutMsg)
     .catch(function(err){
       if(!(err instanceof Promise.TimeoutError)){
@@ -4194,7 +4187,7 @@ return this.closing = Promise.map(this.queues, function(queue) {
   this.emit.apply(this, args);
 
   // Emit global event
-  args[0] = args[0] + &#x27;@&#x27; + this.name;
+  args[0] = args[0] + '@' + this.name;
   return Disturbed.prototype.distEmit.apply(this, args);
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
@@ -4205,8 +4198,8 @@ var job = new Job(queue, data, opts);
 
 return addJob(queue, job).then(function(jobId){
   job.jobId = jobId;
-  queue.<span class="apidocCodeKeywordSpan">distEmit</span>(&#x27;waiting&#x27;, job.toJSON());
-  debuglog(&#x27;Job added&#x27;, jobId);
+  queue.<span class="apidocCodeKeywordSpan">distEmit</span>('waiting', job.toJSON());
+  debuglog('Job added', jobId);
   return job;
 });
 };
@@ -4231,12 +4224,12 @@ Job.fromId = function(queue, jobId){
   // Get all jobids and empty all lists atomically.
   var multi = this.multi();
 
-  multi.lrange(this.toKey(&#x27;wait&#x27;), 0, -1);
-  multi.lrange(this.toKey(&#x27;paused&#x27;), 0, -1);
-  multi.del(this.toKey(&#x27;wait&#x27;));
-  multi.del(this.toKey(&#x27;paused&#x27;));
-  multi.del(this.toKey(&#x27;meta-paused&#x27;));
-  multi.del(this.toKey(&#x27;delayed&#x27;));
+  multi.lrange(this.toKey('wait'), 0, -1);
+  multi.lrange(this.toKey('paused'), 0, -1);
+  multi.del(this.toKey('wait'));
+  multi.del(this.toKey('paused'));
+  multi.del(this.toKey('meta-paused'));
+  multi.del(this.toKey('delayed'));
 
   return multi.exec().spread(function(waiting, paused){
     waiting = waiting[1];
@@ -4254,7 +4247,7 @@ Job.fromId = function(queue, jobId){
     <li>example usage<pre class="apidocCodePre">...
 
 PriorityQueue.prototype.add = function(data, opts) {
-return this.getQueue(opts &#x26;&#x26; opts.priority).add(data, opts);
+return this.getQueue(opts &amp;&amp; opts.priority).add(data, opts);
 }
 
 PriorityQueue.prototype.empty = function() {
@@ -4280,7 +4273,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getActive = function (){
-  return this.getJobs(&#x27;active&#x27;, &#x27;LIST&#x27;);
+  return this.getJobs('active', 'LIST');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4295,7 +4288,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getActiveCount = function () {
-  return this.client.llen(this.toKey(&#x27;active&#x27;));
+  return this.client.llen(this.toKey('active'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4310,7 +4303,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getCompleted = function (){
-  return this.getJobs(&#x27;completed&#x27;, &#x27;SET&#x27;);
+  return this.getJobs('completed', 'SET');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4325,7 +4318,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getCompletedCount = function () {
-  return this.client.scard(this.toKey(&#x27;completed&#x27;));
+  return this.client.scard(this.toKey('completed'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4340,7 +4333,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getDelayed = function (){
-  return this.getJobs(&#x27;delayed&#x27;, &#x27;ZSET&#x27;);
+  return this.getJobs('delayed', 'ZSET');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4355,7 +4348,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getDelayedCount = function () {
-  return this.client.zcard(this.toKey(&#x27;delayed&#x27;));
+  return this.client.zcard(this.toKey('delayed'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4370,7 +4363,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getFailed = function (){
-  return this.getJobs(&#x27;failed&#x27;, &#x27;SET&#x27;);
+  return this.getJobs('failed', 'SET');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4385,7 +4378,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getFailedCount = function () {
-  return this.client.scard(this.toKey(&#x27;failed&#x27;));
+  return this.client.scard(this.toKey('failed'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4417,23 +4410,23 @@ _this.paused = Promise.map(this.queues, function(queue) {
     <li>description and source-code<pre class="apidocCodePre">getJobCountByTypes = function () {
   var _this = this;
   var args = _.compact(Array.prototype.slice.call(arguments));
-  var types = _.compact(args.join(&#x27;,&#x27;).replace(/ /g, &#x27;&#x27;).split(&#x27;,&#x27;));
+  var types = _.compact(args.join(',').replace(/ /g, '').split(','));
 
   var multi = this.multi();
 
   _.each(types, function(type) {
     var key = _this.toKey(type);
     switch(type) {
-      case &#x27;completed&#x27;:
-      case &#x27;failed&#x27;:
+      case 'completed':
+      case 'failed':
         multi.scard(key);
         break;
-      case &#x27;delayed&#x27;:
+      case 'delayed':
         multi.zcard(key);
         break;
-      case &#x27;active&#x27;:
-      case &#x27;wait&#x27;:
-      case &#x27;paused&#x27;:
+      case 'active':
+      case 'wait':
+      case 'paused':
         multi.llen(key);
         break;
     }
@@ -4460,14 +4453,14 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getJobCounts = function (){
-  var types = [&#x27;wait&#x27;, &#x27;active&#x27;, &#x27;completed&#x27;, &#x27;failed&#x27;, &#x27;delayed&#x27;];
+  var types = ['wait', 'active', 'completed', 'failed', 'delayed'];
   var counts = {};
   return this.client.multi()
-    .llen(this.toKey(&#x27;wait&#x27;))
-    .llen(this.toKey(&#x27;active&#x27;))
-    .scard(this.toKey(&#x27;completed&#x27;))
-    .scard(this.toKey(&#x27;failed&#x27;))
-    .zcard(this.toKey(&#x27;delayed&#x27;))
+    .llen(this.toKey('wait'))
+    .llen(this.toKey('active'))
+    .scard(this.toKey('completed'))
+    .scard(this.toKey('failed'))
+    .zcard(this.toKey('delayed'))
     .exec().then(function(result){
       result.forEach(function(res, index){
         counts[types[index]] = res[1] || 0;
@@ -4511,12 +4504,12 @@ _this.paused = Promise.map(this.queues, function(queue) {
   end = _.isUndefined(end) ? -1 : end;
 
   switch(type){
-    case &#x27;LIST&#x27;:
+    case 'LIST':
       jobs = this.client.lrange(key, start, end);
       break;
-    case &#x27;SET&#x27;:
+    case 'SET':
       jobs = this.client.smembers(key).then(function(jobIds) {
-        // Can&#x27;t set a range for smembers. So do the slice programatically instead.
+        // Can't set a range for smembers. So do the slice programatically instead.
         // Note that redis ranges are inclusive, so handling for javascript accordingly
         if (end === -1) {
           return jobIds.slice(start);
@@ -4525,7 +4518,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
         return jobIds.slice(start, end + 1);
       });
       break;
-    case &#x27;ZSET&#x27;:
+    case 'ZSET':
       jobs = this.client.zrange(key, start, end);
       break;
   }
@@ -4551,19 +4544,19 @@ _this.paused = Promise.map(this.queues, function(queue) {
   var _this = this;
   if(!this.closing){
     this.retrieving++;
-    return this.moveJob(&#x27;wait&#x27;, &#x27;active&#x27;, opts)
+    return this.moveJob('wait', 'active', opts)
       .then(this.getJobFromId)
       .tap(function(job) {
         _this.retrieving--;
         if (job) {
           _this.processing++;
         } else {
-          _this.emit(&#x27;no-job-retrieved&#x27;);
+          _this.emit('no-job-retrieved');
         }
       })
       .catch(function(err) {
         _this.retrieving--;
-        _this.emit(&#x27;no-job-retrieved&#x27;);
+        _this.emit('no-job-retrieved');
         throw err;
       });
   }else{
@@ -4583,7 +4576,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getPausedCount = function () {
-  return this.client.llen(this.toKey(&#x27;paused&#x27;));
+  return this.client.llen(this.toKey('paused'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4599,8 +4592,8 @@ _this.paused = Promise.map(this.queues, function(queue) {
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getWaiting = function (){
   return Promise.join(
-    this.getJobs(&#x27;wait&#x27;, &#x27;LIST&#x27;),
-    this.getJobs(&#x27;paused&#x27;, &#x27;LIST&#x27;)).spread(function(waiting, paused){
+    this.getJobs('wait', 'LIST'),
+    this.getJobs('paused', 'LIST')).spread(function(waiting, paused){
       return _.concat(waiting, paused);
     });
 }</pre></li>
@@ -4617,7 +4610,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">getWaitingCount = function () {
-  return this.client.llen(this.toKey(&#x27;wait&#x27;));
+  return this.client.llen(this.toKey('wait'));
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -4653,7 +4646,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
   var args = arguments;
   var _this = this;
   var move;
-  if(opts &#x26;&#x26; opts.block === false){
+  if(opts &amp;&amp; opts.block === false){
     if(!this.closing){
       move = this.bclient.rpoplpush(this.toKey(src), this.toKey(dst));
     }else{
@@ -4678,7 +4671,7 @@ _this.paused = Promise.map(this.queues, function(queue) {
     // slight hazard for priority queues (will only affect its order).
     //
     if(jobId){
-      return _this.client.zrem(_this.toKey(&#x27;priority&#x27;), jobId).then(function(){
+      return _this.client.zrem(_this.toKey('priority'), jobId).then(function(){
         return jobId;
       });
     }
@@ -4706,25 +4699,25 @@ _this.paused = Promise.map(this.queues, function(queue) {
   return scripts.moveUnlockedJobsToWait(this).then(function(responses){
     var handleFailedJobs = responses[0].map(function(jobId){
       return _this.getJobFromId(jobId).then(function(job){
-        _this.distEmit(&#x27;failed&#x27;, job, new Error(&#x27;job stalled more than allowable limit&#x27;));
+        _this.distEmit('failed', job, new Error('job stalled more than allowable limit'));
         return null;
       });
     });
     var handleStalledJobs = responses[1].map(function(jobId){
       return _this.getJobFromId(jobId).then(function(job){
-        _this.distEmit(&#x27;stalled&#x27;, job);
+        _this.distEmit('stalled', job);
         return null;
       });
     });
     return Promise.all(handleFailedJobs.concat(handleStalledJobs));
   }).catch(function(err){
-    console.error(&#x27;Failed to handle unlocked job in active:&#x27;, err);
+    console.error('Failed to handle unlocked job in active:', err);
   });
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 
-// the index is reversed to the actual priority number (0 is &#x27;critical&#x27;)
-// so flip it to get the correct &#x22;priority index&#x22;
+// the index is reversed to the actual priority number (0 is 'critical')
+// so flip it to get the correct "priority index"
 var nbJobsToProcess = _this.strategy(PriorityQueue.priorities.critical - index);
 var i = 0;
 
@@ -4736,7 +4729,7 @@ var fn = function() {
       if (job) {
         emptyLoop = false;
         return queue.processJob(job).then(function() {
-          if (++i &#x3c; nbJobsToProcess &#x26;&#x26; !_this.paused) {
+          if (++i &lt; nbJobsToProcess &amp;&amp; !_this.paused) {
 ...</pre></li>
     </ul>
 
@@ -4762,12 +4755,12 @@ var _this = this;
 // Get all jobids and empty all lists atomically.
 var multi = this.<span class="apidocCodeKeywordSpan">multi</span>();
 
-multi.lrange(this.toKey(&#x27;wait&#x27;), 0, -1);
-multi.lrange(this.toKey(&#x27;paused&#x27;), 0, -1);
-multi.del(this.toKey(&#x27;wait&#x27;));
-multi.del(this.toKey(&#x27;paused&#x27;));
-multi.del(this.toKey(&#x27;meta-paused&#x27;));
-multi.del(this.toKey(&#x27;delayed&#x27;));
+multi.lrange(this.toKey('wait'), 0, -1);
+multi.lrange(this.toKey('paused'), 0, -1);
+multi.del(this.toKey('wait'));
+multi.del(this.toKey('paused'));
+multi.del(this.toKey('meta-paused'));
+multi.del(this.toKey('delayed'));
 ...</pre></li>
     </ul>
 
@@ -4784,7 +4777,7 @@ multi.del(this.toKey(&#x27;delayed&#x27;));
   var args = Array.prototype.slice.call(arguments);
   var promise = Disturbed.prototype.on.apply(this, args);
   var _this = this;
-  promise.catch(function(err){ _this.emit(&#x27;error&#x27;, err); });
+  promise.catch(function(err){ _this.emit('error', err); });
   return this;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
@@ -4795,14 +4788,14 @@ queue.resume().then(function(){
 
 A queue emits also some useful events:
 ```javascript
-.<span class="apidocCodeKeywordSpan">on</span>(&#x27;ready&#x27;, function() {
+.<span class="apidocCodeKeywordSpan">on</span>('ready', function() {
   // Queue ready for job
   // All Redis connections are done
 })
-.on(&#x27;error&#x27;, function(error) {
+.on('error', function(error) {
   // Error
 })
-.on(&#x27;active&#x27;, function(job, jobPromise){
+.on('active', function(job, jobPromise){
 ...</pre></li>
     </ul>
 
@@ -4824,7 +4817,7 @@ A queue emits also some useful events:
   this.queues[PriorityQueue.priorities[key]] = queue;
 }
 
-var groupEvents = [&#x27;ready&#x27;, &#x27;paused&#x27;, &#x27;resumed&#x27;]
+var groupEvents = ['ready', 'paused', 'resumed']
 groupEvents.forEach(function(event) {
   Promise.map(_this.queues, function(queue) {
     return new Promise(function(resolve, reject) {
@@ -4833,8 +4826,8 @@ groupEvents.forEach(function(event) {
   }).then(_this.emit.bind(_this, event))
 })
 
-var singleEvents = [&#x27;error&#x27;, &#x27;active&#x27;, &#x27;stalled&#x27;, &#x27;progress&#x27;, &#x27;completed&#x27;, &#x27
-;failed&#x27;, &#x27;cleaned&#x27;]
+var singleEvents = ['error', 'active', 'stalled', 'progress', 'completed', '
+;failed', 'cleaned']
 singleEvents.forEach(function(event) {
   _this.queues.forEach(function(queue) {
 ...</pre></li>
@@ -4862,13 +4855,13 @@ singleEvents.forEach(function(event) {
       });
     }
 
-    return !doNotWaitActive &#x26;&#x26; this.whenCurrentJobsFinished();
+    return !doNotWaitActive &amp;&amp; this.whenCurrentJobsFinished();
   }else{
     return pauseResumeGlobal(this, true);
   }
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-  return Promise.reject(new Error(&#x27;some unexpected error&#x27;));
+  return Promise.reject(new Error('some unexpected error'));
 });
 ```
 
@@ -4897,7 +4890,7 @@ queue.resume().then(function(){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">process = function (concurrency, handler){
   var _this = this;
-  if(typeof concurrency === &#x27;function&#x27;){
+  if(typeof concurrency === 'function'){
     handler = concurrency;
     concurrency = 1;
   }
@@ -4905,7 +4898,7 @@ queue.resume().then(function(){
   this.setHandler(handler);
 
   var runQueueWhenReady = function(){
-    _this.bclient.once(&#x27;ready&#x27;, function(){
+    _this.bclient.once('ready', function(){
       _this.run(concurrency).catch(function(err){
         console.error(err);
       });
@@ -4914,8 +4907,8 @@ queue.resume().then(function(){
 
   // attempt to restart the queue when the client throws
   // an error or the connection is dropped by redis
-  this.bclient.on(&#x27;error&#x27;, runQueueWhenReady);
-  this.bclient.on(&#x27;end&#x27;, runQueueWhenReady);
+  this.bclient.on('error', runQueueWhenReady);
+  this.bclient.on('end', runQueueWhenReady);
 
   return this.run(concurrency).catch(function(err){
     console.error(err);
@@ -4923,12 +4916,12 @@ queue.resume().then(function(){
   });
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-var Queue = require(&#x27;bull&#x27;);
+var Queue = require('bull');
 
-var videoQueue = Queue(&#x27;video transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var audioQueue = Queue(&#x27;audio transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var imageQueue = Queue(&#x27;image transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
-var pdfQueue = Queue(&#x27;pdf transcoding&#x27;, 6379, &#x27;127.0.0.1&#x27;);
+var videoQueue = Queue('video transcoding', 6379, '127.0.0.1');
+var audioQueue = Queue('audio transcoding', 6379, '127.0.0.1');
+var imageQueue = Queue('image transcoding', 6379, '127.0.0.1');
+var pdfQueue = Queue('pdf transcoding', 6379, '127.0.0.1');
 
 videoQueue.<span class="apidocCodeKeywordSpan">process</span>(function(job, done){
 
@@ -4970,15 +4963,15 @@ job.progress(42);
   var renew = false;
   var lockRenewer = function(){
     return job.takeLock(renew, true).then(function(lock){
-      if(lock &#x26;&#x26; !timmerStopped){
+      if(lock &amp;&amp; !timmerStopped){
         renew = true;
-        lockRenewId = _this.timers.set(&#x27;lockRenewer&#x27;, _this.LOCK_RENEW_TIME, lockRenewer);
+        lockRenewId = _this.timers.set('lockRenewer', _this.LOCK_RENEW_TIME, lockRenewer);
       }
       // TODO: if we failed to re-acquire the lock while trying to renew, should we let the job
       // handler know and cancel the timer?
       return lock;
     }, function(err){
-      console.error(&#x27;Error renewing lock &#x27; + err);
+      console.error('Error renewing lock ' + err);
     });
   };
 
@@ -5007,7 +5000,7 @@ job.progress(42);
     }
 
     return job.moveToCompleted(data).then(function(){
-      return _this.distEmit(&#x27;completed&#x27;, job, data);
+      return _this.distEmit('completed', job, data);
     });
   }
 
@@ -5021,10 +5014,10 @@ job.progress(42);
         .then(job.moveToFailed(err))
         .then(job.releaseLock.bind(job))
         .then(function(){
-          return _this.distEmit(&#x27;failed&#x27;, job, error);
+          return _this.distEmit('failed', job, error);
         });
     }, function(err){
-      console.error(&#x27;failed to re-obtain lock before moving to failed, bailing: &#x27;, err);
+      console.error('failed to re-obtain lock before moving to failed, bailing: ', err);
       stopTimer();
     });
     _this.processing--;
@@ -5038,7 +5031,7 @@ job.progress(42);
         jobPromise = jobPromise.timeout(timeoutMs);
       }
 
-      _this.distEmit(&#x27;active&#x27;, job, jobPromise);
+      _this.distEmit('active', job, jobPromise);
 
       return jobPromise
         .then(handleCompleted, handleFailed);
@@ -5054,7 +5047,7 @@ return queue.moveUnlockedJobsToWait().then(queue.getNextJob.bind(queue, {
     if (job) {
       emptyLoop = false;
       return queue.<span class="apidocCodeKeywordSpan">processJob</span>(job).then(function() {
-        if (++i &#x3c; nbJobsToProcess &#x26;&#x26; !_this.paused) {
+        if (++i &lt; nbJobsToProcess &amp;&amp; !_this.paused) {
           return fn();
         }
       })
@@ -5083,7 +5076,7 @@ return queue.moveUnlockedJobsToWait().then(queue.getNextJob.bind(queue, {
         .then(_this.getNextJob)
         .then(_this.processJob)
         .then(processJobs, function(err){
-          console.error(&#x27;Error processing job:&#x27;, err);
+          console.error('Error processing job:', err);
           processJobs();
         }).catch(reject);
     });
@@ -5128,7 +5121,7 @@ queue.<span class="apidocCodeKeywordSpan">resume</span>().then(function(){
 
 A queue emits also some useful events:
 ```javascript
-.on(&#x27;ready&#x27;, function() {
+.on('ready', function() {
 ...</pre></li>
     </ul>
 
@@ -5201,12 +5194,12 @@ var _this = this;
     <ul>
     <li>description and source-code<pre class="apidocCodePre">setHandler = function (handler){
   if(this.handler) {
-    throw new Error(&#x27;Cannot define a handler more than once per Queue instance&#x27;);
+    throw new Error('Cannot define a handler more than once per Queue instance');
   }
 
   handler = handler.bind(this);
 
-  if(handler.length &#x3e; 1){
+  if(handler.length &gt; 1){
     this.handler = Promise.promisify(handler);
   }else{
     this.handler = Promise.method(handler);
@@ -5241,7 +5234,7 @@ PriorityQueue.prototype.process = function(handler) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">startMoveUnlockedJobsToWait = function () {
-  if (this.STALLED_JOB_CHECK_INTERVAL &#x3e; 0){
+  if (this.STALLED_JOB_CHECK_INTERVAL &gt; 0){
     clearInterval(this.moveUnlockedJobsToWaitInterval);
     this.moveUnlockedJobsToWaitInterval =
       setInterval(this.moveUnlockedJobsToWait, this.STALLED_JOB_CHECK_INTERVAL);
@@ -5260,7 +5253,7 @@ PriorityQueue.prototype.process = function(handler) {
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">toKey = function (queueType){
-  return [this.keyPrefix, this.name, queueType].join(&#x27;:&#x27;);
+  return [this.keyPrefix, this.name, queueType].join(':');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 };
@@ -5293,23 +5286,23 @@ Job.fromId = function(queue, jobId){
     <li>description and source-code<pre class="apidocCodePre">updateDelayTimer = function (newDelayedTimestamp){
   var _this = this;
 
-  if(newDelayedTimestamp &#x3c; _this.delayedTimestamp &#x26;&#x26; newDelayedTimestamp &#x3c; (MAX_TIMEOUT_MS + Date.now())){
+  if(newDelayedTimestamp &lt; _this.delayedTimestamp &amp;&amp; newDelayedTimestamp &lt; (MAX_TIMEOUT_MS + Date.now())){
     clearTimeout(this.delayTimer);
     this.delayedTimestamp = newDelayedTimestamp;
 
     var nextDelayedJob = newDelayedTimestamp - Date.now();
-    nextDelayedJob = nextDelayedJob &#x3c; 0 ? 0 : nextDelayedJob;
+    nextDelayedJob = nextDelayedJob &lt; 0 ? 0 : nextDelayedJob;
 
     this.delayTimer = setTimeout(function(){
       scripts.updateDelaySet(_this, _this.delayedTimestamp).then(function(nextTimestamp){
         if(nextTimestamp){
-          nextTimestamp = nextTimestamp &#x3c; Date.now() ? Date.now() : nextTimestamp;
+          nextTimestamp = nextTimestamp &lt; Date.now() ? Date.now() : nextTimestamp;
         }else{
           nextTimestamp = Number.MAX_VALUE;
         }
         _this.updateDelayTimer(nextTimestamp);
       }).catch(function(err){
-        console.error(&#x27;Error updating the delay timer&#x27;, err);
+        console.error('Error updating the delay timer', err);
       });
       _this.delayedTimestamp = Number.MAX_VALUE;
     }, nextDelayedJob);
@@ -5336,18 +5329,18 @@ Job.fromId = function(queue, jobId){
       resolve();
     }else{
       resolver = _.after(count, function(){
-        _this.removeListener(&#x27;stalled&#x27;, resolver);
-        _this.removeListener(&#x27;completed&#x27;, resolver);
-        _this.removeListener(&#x27;failed&#x27;, resolver);
-        _this.removeListener(&#x27;no-job-retrieved&#x27;, resolver);
+        _this.removeListener('stalled', resolver);
+        _this.removeListener('completed', resolver);
+        _this.removeListener('failed', resolver);
+        _this.removeListener('no-job-retrieved', resolver);
         clearInterval(_this.moveUnlockedJobsToWaitInterval);
         resolve();
       });
 
-      _this.on(&#x27;stalled&#x27;, resolver);
-      _this.on(&#x27;completed&#x27;, resolver);
-      _this.on(&#x27;failed&#x27;, resolver);
-      _this.on(&#x27;no-job-retrieved&#x27;, resolver);
+      _this.on('stalled', resolver);
+      _this.on('completed', resolver);
+      _this.on('failed', resolver);
+      _this.on('no-job-retrieved', resolver);
 
       _this.startMoveUnlockedJobsToWait();
     }
@@ -5367,7 +5360,7 @@ Job.fromId = function(queue, jobId){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">whenCurrentMoveFinished = function (){
   var currentMove = this.bclient.commandQueue.peekFront()
-  return currentMove &#x26;&#x26; currentMove.command.promise || Promise.resolve();
+  return currentMove &amp;&amp; currentMove.command.promise || Promise.resolve();
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -5387,31 +5380,31 @@ Job.fromId = function(queue, jobId){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">_isJobInList = function (keyVar, argVar, operator) {
- 	keyVar = keyVar || &#x27;KEYS[1]&#x27;;
-  argVar = argVar || &#x27;ARGV[1]&#x27;;
-  operator = operator || &#x27;return&#x27;;
+ 	keyVar = keyVar || 'KEYS[1]';
+  argVar = argVar || 'ARGV[1]';
+  operator = operator || 'return';
   return [
-    &#x27;local function item_in_list (list, item)&#x27;,
-    &#x27;  for _, v in pairs(list) do&#x27;,
-    &#x27;    if v == item then&#x27;,
-    &#x27;      return 1&#x27;,
-    &#x27;    end&#x27;,
-    &#x27;  end&#x27;,
-    &#x27;  return nil&#x27;,
-    &#x27;end&#x27;,
-    [&#x27;local items = redis.call(&#x22;LRANGE&#x22;,&#x27;, keyVar, &#x27; , 0, -1)&#x27;].join(&#x27;&#x27;),
-    [operator, &#x27; item_in_list(items, &#x27;, argVar, &#x27;)&#x27;].join(&#x27;&#x27;)
-  ].join(&#x27;\n&#x27;);
+    'local function item_in_list (list, item)',
+    '  for _, v in pairs(list) do',
+    '    if v == item then',
+    '      return 1',
+    '    end',
+    '  end',
+    '  return nil',
+    'end',
+    ['local items = redis.call("LRANGE",', keyVar, ' , 0, -1)'].join(''),
+    [operator, ' item_in_list(items, ', argVar, ')'].join('')
+  ].join('\n');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-    &#x27;  return nil&#x27;,
-    &#x27;end&#x27;,
-    [&#x27;local items = redis.call(&#x22;LRANGE&#x22;,&#x27;, keyVar, &#x27; , 0, -1)&#x27;].join(&#x27;&#x27;),
-    [operator, &#x27; item_in_list(items, &#x27;, argVar, &#x27;)&#x27;].join(&#x27;&#x27;)
-  ].join(&#x27;\n&#x27;);
+    '  return nil',
+    'end',
+    ['local items = redis.call("LRANGE",', keyVar, ' , 0, -1)'].join(''),
+    [operator, ' item_in_list(items, ', argVar, ')'].join('')
+  ].join('\n');
 },
 isJobInList: function(client, listKey, jobId){
-  return execScript(client, &#x27;isJobInList&#x27;, this.<span class="apidocCodeKeywordSpan">_isJobInList</span>(), 1, listKey,
+  return execScript(client, 'isJobInList', this.<span class="apidocCodeKeywordSpan">_isJobInList</span>(), 1, listKey,
 jobId).then(function(result){
     return result === 1;
   });
@@ -5439,11 +5432,11 @@ addJob: function(client, toKey, job, opts){
   opts.lifo = !!(opts.lifo);
 
   var delayTimestamp = job.timestamp + job.delay;
-  if(job.delay &#x26;&#x26; delayTimestamp &#x3e; Date.now()){
+  if(job.delay &amp;&amp; delayTimestamp &gt; Date.now()){
     delayed = true;
-    scriptName = &#x27;addJob:delayed&#x27;;
+    scriptName = 'addJob:delayed';
   } else {
-    scriptName = &#x27;addJob&#x27;+(opts.lifo?&#x27;:lifo&#x27;:&#x27;&#x27;) + (opts.priority?&#x27;:priority&#x27;:&#x27;&#x27;);
+    scriptName = 'addJob'+(opts.lifo?':lifo':'') + (opts.priority?':priority':'');
   }
 
 <span class="apidocCodeCommentSpan">  /*
@@ -5454,86 +5447,86 @@ addJob: function(client, toKey, job, opts){
 </span>
   var jobArgs = _.flatten(_.toPairs(job));
 
-  var keys = _.map([&#x27;wait&#x27;, &#x27;paused&#x27;, &#x27;meta-paused&#x27;, &#x27;jobs&#x27;, &#x27;id&#x27;, &#x27;delayed&#x27;, &#x27;priority&#x27;], function(name){
+  var keys = _.map(['wait', 'paused', 'meta-paused', 'jobs', 'id', 'delayed', 'priority'], function(name){
     return toKey(name);
   });
-  var baseKey = toKey(&#x27;&#x27;);
+  var baseKey = toKey('');
 
   var argvs = _.map(jobArgs, function(arg, index){
-    return &#x27;, ARGV[&#x27;+(index+4)+&#x27;]&#x27;;
+    return ', ARGV['+(index+4)+']';
   })
 
   var script = [
-    &#x27;local jobCounter = redis.call(&#x22;INCR&#x22;, KEYS[5])&#x27;,
-    &#x27;local jobId&#x27;,
-    &#x27;if ARGV[2] == &#x22;&#x22; then jobId = jobCounter else jobId = ARGV[2] end&#x27;,
-    &#x27;local jobIdKey = ARGV[1] .. jobId&#x27;,
-    &#x27;if redis.call(&#x22;EXISTS&#x22;, jobIdKey) == 1 then return jobId end&#x27;,
-    &#x27;redis.call(&#x22;HMSET&#x22;, jobIdKey&#x27; + argvs.join(&#x27;&#x27;) + &#x27;)&#x27;,
+    'local jobCounter = redis.call("INCR", KEYS[5])',
+    'local jobId',
+    'if ARGV[2] == "" then jobId = jobCounter else jobId = ARGV[2] end',
+    'local jobIdKey = ARGV[1] .. jobId',
+    'if redis.call("EXISTS", jobIdKey) == 1 then return jobId end',
+    'redis.call("HMSET", jobIdKey' + argvs.join('') + ')',
   ];
 
   var delayTimestamp = job.timestamp + job.delay;
   if(delayed){
     script.push.apply(script, [
-      &#x27; local timestamp = tonumber(ARGV[&#x27; + (argvs.length + 4) + &#x27;]) * 0x1000 + bit.band(jobCounter, 0xfff)&#x27;,
-      &#x27; redis.call(&#x22;ZADD&#x22;, KEYS[6], timestamp, jobId)&#x27;,
-      &#x27; redis.call(&#x22;PUBLISH&#x22;, KEYS[6], (timestamp / 0x1000))&#x27;,
-      &#x27; return jobId&#x27;,
+      ' local timestamp = tonumber(ARGV[' + (argvs.length + 4) + ']) * 0x1000 + bit.band(jobCounter, 0xfff)',
+      ' redis.call("ZADD", KEYS[6], timestamp, jobId)',
+      ' redis.call("PUBLISH", KEYS[6], (timestamp / 0x1000))',
+      ' return jobId',
     ]);
   }else{
     var push, pushPaused;
-    var add = _.template(&#x27;redis.call(&#x22;&#x3c;%= direction %&#x3e;&#x22;, &#x3c;%= waitQueue %&#x3e;, jobId)&#x27;);
+    var add = _.template('redis.call("&lt;%= direction %&gt;", &lt;%= waitQueue %&gt;, jobId)');
 
     if(opts.lifo){
-      push = add({direction: &#x27;RPUSH&#x27;, waitQueue: &#x27;KEYS[1]&#x27;});
-      pushPaused = add({direction: &#x27;RPUSH&#x27;, waitQueue: &#x27;KEYS[2]&#x27;});
+      push = add({direction: 'RPUSH', waitQueue: 'KEYS[1]'});
+      pushPaused = add({direction: 'RPUSH', waitQueue: 'KEYS[2]'});
     }else if(opts.priority){
       script.push.apply(script, [
-        &#x27; redis.call(&#x22;ZADD&#x22;, KEYS[7], ARGV[3], jobId)&#x27;,
-        &#x27; local count = redis.call(&#x22;ZCOUNT&#x22;, KEYS[7], 0, ARGV[3])&#x27;,
+        ' redis.call("ZADD", KEYS[7], ARGV[3], jobId)',
+        ' local count = redis.call("ZCOUNT", KEYS[7], 0, ARGV[3])',
       ]);
 
       var priorityAdd = _.template([
-        &#x27; local len = redis.call(&#x22;LLEN&#x22;, &#x3c;%= waitQueue %&#x3e;)&#x27;,
-        &#x27; local id = redis.call(&#x22;LINDEX&#x22;, &#x3c;%= waitQueue %&#x3e;, len - (count-1))&#x27;,
-        &#x27; if id then&#x27;,
-        &#x27;   redis.call(&#x22;LINSERT&#x22;, &#x3c;%= waitQueue %&#x3e;, &#x22;BEFORE&#x22;, id, jobId)&#x27;,
-        &#x27; else&#x27;,
-        &#x27;   redis.call(&#x22;RPUSH&#x22;, &#x3c;%= waitQueue %&#x3e;, jobId)&#x27;,
-        &#x27; end&#x27;,
-      ].join(&#x27;\n&#x27;));
+        ' local len = redis.call("LLEN", &lt;%= waitQueue %&gt;)',
+        ' local id = redis.call("LINDEX", &lt;%= waitQueue %&gt;, len - (count-1))',
+        ' if id then',
+        '   redis.call("LINSERT", &lt;%= waitQueue %&gt;, "BEFORE", id, jobId)',
+        ' else',
+        '   redis.call("RPUSH", &lt;%= waitQueue %&gt;, jobId)',
+        ' end',
+      ].join('\n'));
 
-      push = priorityAdd({waitQueue: &#x27;KEYS[1]&#x27;});
-      pushPaused = priorityAdd({waitQueue: &#x27;KEYS[2]&#x27;});
+      push = priorityAdd({waitQueue: 'KEYS[1]'});
+      pushPaused = priorityAdd({waitQueue: 'KEYS[2]'});
     }else{
-      push = add({direction: &#x27;LPUSH&#x27;, waitQueue: &#x27;KEYS[1]&#x27;});
-      pushPaused = add({direction: &#x27;LPUSH&#x27;, waitQueue: &#x27;KEYS[2]&#x27;});
+      push = add({direction: 'LPUSH', waitQueue: 'KEYS[1]'});
+      pushPaused = add({direction: 'LPUSH', waitQueue: 'KEYS[2]'});
     }
 
     //
     // Whe check for the meta-paused key to decide if we are paused or not
     // (since an empty list and !EXISTS are not really the same)
     script.push.apply(script, [
-      &#x27;if redis.call(&#x22;EXISTS&#x22;, KEYS[3]) ~= 1 then&#x27;,
+      'if redis.call("EXISTS", KEYS[3]) ~= 1 then',
       push,
-      &#x27;else&#x27;,
+      'else',
       pushPaused,
-      &#x27;end&#x27;,
-      &#x27;redis.call(&#x22;PUBLISH&#x22;, KEYS[4], jobId)&#x27;,
-      &#x27;return jobId .. &#x22;&#x22;&#x27;
+      'end',
+      'redis.call("PUBLISH", KEYS[4], jobId)',
+      'return jobId .. ""'
     ]);
   }
 
   var args = [
     client,
     scriptName,
-    script.join(&#x27;\n&#x27;),
+    script.join('\n'),
     keys.length
   ];
 
   args.push.apply(args, keys);
   args.push(baseKey);
-  args.push(opts.customJobId || &#x27;&#x27;);
+  args.push(opts.customJobId || '');
   args.push(opts.priority);
   args.push.apply(args, jobArgs);
   args.push(delayTimestamp);
@@ -5571,62 +5564,62 @@ Job.create = function(queue, data, opts){
     <li>description and source-code<pre class="apidocCodePre">cleanJobsInSet = function (queue, set, ts, limit) {
   var command;
   var removeCommand;
-  var breakEarlyCommand = &#x27;&#x27;;
+  var breakEarlyCommand = '';
   var hash;
   limit = limit || 0;
 
   switch(set) {
-    case &#x27;completed&#x27;:
-    case &#x27;failed&#x27;:
-      command = &#x27;local jobs = redis.call(&#x22;SMEMBERS&#x22;, KEYS[1])&#x27;;
-      removeCommand = &#x27;redis.call(&#x22;SREM&#x22;, KEYS[1], job)&#x27;;
-      hash = &#x27;cleanSet&#x27;;
+    case 'completed':
+    case 'failed':
+      command = 'local jobs = redis.call("SMEMBERS", KEYS[1])';
+      removeCommand = 'redis.call("SREM", KEYS[1], job)';
+      hash = 'cleanSet';
       break;
-    case &#x27;wait&#x27;:
-    case &#x27;active&#x27;:
-    case &#x27;paused&#x27;:
-      command = &#x27;local jobs = redis.call(&#x22;LRANGE&#x22;, KEYS[1], 0, -1)&#x27;;
-      removeCommand = &#x27;redis.call(&#x22;LREM&#x22;, KEYS[1], 0, job)&#x27;;
-      hash = &#x27;cleanList&#x27;;
+    case 'wait':
+    case 'active':
+    case 'paused':
+      command = 'local jobs = redis.call("LRANGE", KEYS[1], 0, -1)';
+      removeCommand = 'redis.call("LREM", KEYS[1], 0, job)';
+      hash = 'cleanList';
       break;
-    case &#x27;delayed&#x27;:
-      command = &#x27;local jobs = redis.call(&#x22;ZRANGE&#x22;, KEYS[1], 0, -1)&#x27;;
-      removeCommand = &#x27;redis.call(&#x22;ZREM&#x22;, KEYS[1], job)&#x27;;
-      hash = &#x27;cleanOSet&#x27;;
+    case 'delayed':
+      command = 'local jobs = redis.call("ZRANGE", KEYS[1], 0, -1)';
+      removeCommand = 'redis.call("ZREM", KEYS[1], job)';
+      hash = 'cleanOSet';
       break;
   }
 
-  if(limit &#x3e; 0) {
+  if(limit &gt; 0) {
     breakEarlyCommand = [
-      &#x27;if deletedCount &#x3e;= limit then&#x27;,
-      &#x27;  break&#x27;,
-      &#x27;end&#x27;,
-    ].join(&#x27;\n&#x27;);
+      'if deletedCount &gt;= limit then',
+      '  break',
+      'end',
+    ].join('\n');
 
-    hash = hash + &#x27;WithLimit&#x27;;
+    hash = hash + 'WithLimit';
   }
 
   var script = [
     command,
-    &#x27;local deleted = {}&#x27;,
-    &#x27;local deletedCount = 0&#x27;,
-    &#x27;local limit = tonumber(ARGV[3])&#x27;,
-    &#x27;local jobTS&#x27;,
-    &#x27;for _, job in ipairs(jobs) do&#x27;,
+    'local deleted = {}',
+    'local deletedCount = 0',
+    'local limit = tonumber(ARGV[3])',
+    'local jobTS',
+    'for _, job in ipairs(jobs) do',
     breakEarlyCommand,
-    &#x27;  local jobKey = ARGV[1] .. job&#x27;,
-    &#x27;  if (redis.call(&#x22;EXISTS&#x22;, jobKey ..  &#x22;:lock&#x22;) == 0) then&#x27;,
-    &#x27;    jobTS = redis.call(&#x22;HGET&#x22;, jobKey, &#x22;timestamp&#x22;)&#x27;,
-    &#x27;    if(not jobTS or jobTS &#x3c; ARGV[2]) then&#x27;,
+    '  local jobKey = ARGV[1] .. job',
+    '  if (redis.call("EXISTS", jobKey ..  ":lock") == 0) then',
+    '    jobTS = redis.call("HGET", jobKey, "timestamp")',
+    '    if(not jobTS or jobTS &lt; ARGV[2]) then',
     removeCommand,
-    &#x27;      redis.call(&#x22;DEL&#x22;, jobKey)&#x27;,
-    &#x27;      deletedCount = deletedCount + 1&#x27;,
-    &#x27;      table.insert(deleted, job)&#x27;,
-    &#x27;    end&#x27;,
-    &#x27;  end&#x27;,
-    &#x27;end&#x27;,
-    &#x27;return deleted&#x27;
-  ].join(&#x27;\n&#x27;);
+    '      redis.call("DEL", jobKey)',
+    '      deletedCount = deletedCount + 1',
+    '      table.insert(deleted, job)',
+    '    end',
+    '  end',
+    'end',
+    'return deleted'
+  ].join('\n');
 
   var args = [
     queue.client,
@@ -5634,7 +5627,7 @@ Job.create = function(queue, data, opts){
     script,
     1,
     queue.toKey(set),
-    queue.toKey(&#x27;&#x27;),
+    queue.toKey(''),
     ts,
     limit
   ];
@@ -5654,7 +5647,7 @@ Job.create = function(queue, data, opts){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">isJobInList = function (client, listKey, jobId){
-  return execScript(client, &#x27;isJobInList&#x27;, this._isJobInList(), 1, listKey, jobId).then(function(result){
+  return execScript(client, 'isJobInList', this._isJobInList(), 1, listKey, jobId).then(function(result){
     return result === 1;
   });
 }</pre></li>
@@ -5698,33 +5691,33 @@ return scripts.moveToSet(queue, set, jobId, context);
     }
   );
 
-  var deleteJob = &#x27;redis.call(&#x22;DEL&#x22;, KEYS[3])&#x27;;
+  var deleteJob = 'redis.call("DEL", KEYS[3])';
 
   var moveJob = [
-    &#x27;redis.call(&#x22;SADD&#x22;, KEYS[2], ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;HSET&#x22;, KEYS[3], &#x22;returnvalue&#x22;, ARGV[2])&#x27;,
-  ].join(&#x27;\n&#x27;);
+    'redis.call("SADD", KEYS[2], ARGV[1])',
+    'redis.call("HSET", KEYS[3], "returnvalue", ARGV[2])',
+  ].join('\n');
 
   var script = [
-    &#x27;if redis.call(&#x22;EXISTS&#x22;, KEYS[3]) == 1 then&#x27;, // Make sure job exists
-    &#x27; redis.call(&#x22;LREM&#x22;, KEYS[1], -1, ARGV[1])&#x27;,
+    'if redis.call("EXISTS", KEYS[3]) == 1 then', // Make sure job exists
+    ' redis.call("LREM", KEYS[1], -1, ARGV[1])',
     target ? moveJob : deleteJob,
-    &#x27; return 0&#x27;,
-    &#x27;else&#x27;,
-    &#x27; return -1&#x27;,
-    &#x27;end&#x27;
-  ].join(&#x27;\n&#x27;);
+    ' return 0',
+    'else',
+    ' return -1',
+    'end'
+  ].join('\n');
 
   var args = [
     job.queue.client,
-    &#x27;move&#x27; + src + (target ? target : &#x27;&#x27;),
+    'move' + src + (target ? target : ''),
     script,
     keys.length,
     keys[0],
     keys[1],
     keys[2],
     job.jobId,
-    job.returnvalue ? JSON.stringify(job.returnvalue) : &#x27;&#x27;
+    job.returnvalue ? JSON.stringify(job.returnvalue) : ''
   ];
 
   var returnLockOrErrorCode = function(lock) {
@@ -5742,12 +5735,12 @@ return scripts.moveToSet(queue, set, jobId, context);
     switch (result){
       case -1:
         if(src){
-          throw new Error(&#x27;Missing Job &#x27; + job.jobId + &#x27; when trying to move from &#x27; + src + &#x27; to &#x27; + target);
+          throw new Error('Missing Job ' + job.jobId + ' when trying to move from ' + src + ' to ' + target);
         } else {
-          throw new Error(&#x27;Missing Job &#x27; + job.jobId + &#x27; when trying to remove it from &#x27; + src);
+          throw new Error('Missing Job ' + job.jobId + ' when trying to remove it from ' + src);
         }
       case -2:
-        throw new Error(&#x27;Cannot get lock for job &#x27; + job.jobId + &#x27; when trying to move from &#x27; + src);
+        throw new Error('Cannot get lock for job ' + job.jobId + ' when trying to move from ' + src);
       default:
         return job.releaseLock()
     }
@@ -5755,7 +5748,7 @@ return scripts.moveToSet(queue, set, jobId, context);
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 Job.prototype.move = function(src, target, returnValue){
-  if(target === &#x27;completed&#x27;){
+  if(target === 'completed'){
     this.returnvalue = returnValue || 0;
     if(this.opts.removeOnComplete){
       target = void 0;
@@ -5782,7 +5775,7 @@ Job.prototype.moveToFailed = function(err){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">moveToCompleted = function (job, removeOnComplete){
-  return scripts.move(job, &#x27;active&#x27;, removeOnComplete ? void 0 : &#x27;completed&#x27;);
+  return scripts.move(job, 'active', removeOnComplete ? void 0 : 'completed');
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
   }
@@ -5796,7 +5789,7 @@ return scripts.<span class="apidocCodeKeywordSpan">moveToCompleted</span>(this, 
 };
 
 Job.prototype.move = function(src, target, returnValue){
-if(target === &#x27;completed&#x27;){
+if(target === 'completed'){
   this.returnvalue = returnValue || 0;
   if(this.opts.removeOnComplete){
     target = void 0;
@@ -5822,16 +5815,16 @@ if(target === &#x27;completed&#x27;){
   //
   context = _.isUndefined(context) ? 0 : context;
 
-  if(set === &#x27;delayed&#x27;) {
+  if(set === 'delayed') {
     context = +context || 0;
-    context = context &#x3c; 0 ? 0 : context;
-    if(context &#x3e; 0){
-      context = context * 0x1000 + (jobId &#x26; 0xfff);
+    context = context &lt; 0 ? 0 : context;
+    if(context &gt; 0){
+      context = context * 0x1000 + (jobId &amp; 0xfff);
     }
   }
 
   var keys = _.map([
-    &#x27;active&#x27;,
+    'active',
     set,
     jobId
     ], function(name){
@@ -5841,7 +5834,7 @@ if(target === &#x27;completed&#x27;){
 
   var args = [
     queue.client,
-    &#x27;moveToSet&#x27;,
+    'moveToSet',
     moveToSetScript,
     keys.length,
     keys[0],
@@ -5853,7 +5846,7 @@ if(target === &#x27;completed&#x27;){
 
   return execScript.apply(scripts, args).then(function(result){
     if(result === -1){
-      throw new Error(&#x27;Missing Job &#x27; + jobId + &#x27; when trying to move from active to &#x27; + set);
+      throw new Error('Missing Job ' + jobId + ' when trying to move from active to ' + set);
     }
   });
 }</pre></li>
@@ -5887,56 +5880,56 @@ if(this.opts.backoff){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">moveUnlockedJobsToWait = function (queue){
   var script = [
-    &#x27;local MAX_STALLED_JOB_COUNT = tonumber(ARGV[1])&#x27;,
-    &#x27;local activeJobs = redis.call(&#x22;LRANGE&#x22;, KEYS[1], 0, -1)&#x27;,
-    &#x27;local stalled = {}&#x27;,
-    &#x27;local failed = {}&#x27;,
-    &#x27;for _, job in ipairs(activeJobs) do&#x27;,
-    &#x27; local jobKey = ARGV[2] .. job&#x27;,
-    &#x27; if(redis.call(&#x22;EXISTS&#x22;, jobKey .. &#x22;:lock&#x22;) == 0) then&#x27;,
+    'local MAX_STALLED_JOB_COUNT = tonumber(ARGV[1])',
+    'local activeJobs = redis.call("LRANGE", KEYS[1], 0, -1)',
+    'local stalled = {}',
+    'local failed = {}',
+    'for _, job in ipairs(activeJobs) do',
+    ' local jobKey = ARGV[2] .. job',
+    ' if(redis.call("EXISTS", jobKey .. ":lock") == 0) then',
     //  Remove from the active queue.
-    &#x27;   redis.call(&#x22;LREM&#x22;, KEYS[1], 1, job)&#x27;,
-    &#x27;   local lockAcquired = redis.call(&#x22;HGET&#x22;, jobKey, &#x22;lockAcquired&#x22;)&#x27;,
-    &#x27;   if(lockAcquired) then&#x27;,
-    //    If it was previously locked then we consider it &#x27;stalled&#x27; (Case A above). If this job
+    '   redis.call("LREM", KEYS[1], 1, job)',
+    '   local lockAcquired = redis.call("HGET", jobKey, "lockAcquired")',
+    '   if(lockAcquired) then',
+    //    If it was previously locked then we consider it 'stalled' (Case A above). If this job
     //    has been stalled too many times, such as if it crashes the worker, then fail it.
-    &#x27;     local stalledCount = redis.call(&#x22;HINCRBY&#x22;, jobKey, &#x22;stalledCounter&#x22;, 1)&#x27;,
-    &#x27;     if(stalledCount &#x3e; MAX_STALLED_JOB_COUNT) then&#x27;,
-    &#x27;       redis.call(&#x22;SADD&#x22;, KEYS[3], job)&#x27;,
-    &#x27;       redis.call(&#x22;HSET&#x22;, jobKey, &#x22;failedReason&#x22;, &#x22;job stalled more than allowable limit&#x22;)&#x27;,
-    &#x27;       table.insert(failed, job)&#x27;,
-    &#x27;     else&#x27;,
+    '     local stalledCount = redis.call("HINCRBY", jobKey, "stalledCounter", 1)',
+    '     if(stalledCount &gt; MAX_STALLED_JOB_COUNT) then',
+    '       redis.call("SADD", KEYS[3], job)',
+    '       redis.call("HSET", jobKey, "failedReason", "job stalled more than allowable limit")',
+    '       table.insert(failed, job)',
+    '     else',
     //      Move the job back to the wait queue, to immediately be picked up by a waiting worker.
-    &#x27;       redis.call(&#x22;RPUSH&#x22;, KEYS[2], job)&#x27;,
-    &#x27;       table.insert(stalled, job)&#x27;,
-    &#x27;     end&#x27;,
-    &#x27;   else&#x27;,
+    '       redis.call("RPUSH", KEYS[2], job)',
+    '       table.insert(stalled, job)',
+    '     end',
+    '   else',
     //    Move the job back to the wait queue, to immediately be picked up by a waiting worker.
-    &#x27;     redis.call(&#x22;RPUSH&#x22;, KEYS[2], job)&#x27;,
-    &#x27;   end&#x27;,
-    &#x27; end&#x27;,
-    &#x27;end&#x27;,
-    &#x27;return {failed, stalled}&#x27;
-  ].join(&#x27;\n&#x27;);
+    '     redis.call("RPUSH", KEYS[2], job)',
+    '   end',
+    ' end',
+    'end',
+    'return {failed, stalled}'
+  ].join('\n');
 
   var args = [
     queue.client,
-    &#x27;moveUnlockedJobsToWait&#x27;,
+    'moveUnlockedJobsToWait',
     script,
     3,
-    queue.toKey(&#x27;active&#x27;),
-    queue.toKey(&#x27;wait&#x27;),
-    queue.toKey(&#x27;failed&#x27;),
+    queue.toKey('active'),
+    queue.toKey('wait'),
+    queue.toKey('failed'),
     queue.MAX_STALLED_JOB_COUNT,
-    queue.toKey(&#x27;&#x27;)
+    queue.toKey('')
   ];
 
   return execScript.apply(scripts, args);
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
 
-// the index is reversed to the actual priority number (0 is &#x27;critical&#x27;)
-// so flip it to get the correct &#x22;priority index&#x22;
+// the index is reversed to the actual priority number (0 is 'critical')
+// so flip it to get the correct "priority index"
 var nbJobsToProcess = _this.strategy(PriorityQueue.priorities.critical - index);
 var i = 0;
 
@@ -5948,7 +5941,7 @@ var fn = function() {
       if (job) {
         emptyLoop = false;
         return queue.processJob(job).then(function() {
-          if (++i &#x3c; nbJobsToProcess &#x26;&#x26; !_this.paused) {
+          if (++i &lt; nbJobsToProcess &amp;&amp; !_this.paused) {
 ...</pre></li>
     </ul>
 
@@ -5964,7 +5957,7 @@ var fn = function() {
     <li>description and source-code<pre class="apidocCodePre">releaseLock = function (job){
   var lock = job.lock;
   if (!lock) {
-    throw new Error(&#x27;Unable to release nonexisting lock&#x27;);
+    throw new Error('Unable to release nonexisting lock');
   }
   return lock.unlock()
 }</pre></li>
@@ -5983,7 +5976,7 @@ return scripts.<span class="apidocCodeKeywordSpan">releaseLock</span>(this)
 Job.prototype.delayIfNeeded = function(){
 if(this.delay){
   var jobDelayedTimestamp = this.timestamp + this.delay;
-  if(jobDelayedTimestamp &#x3e; Date.now()){
+  if(jobDelayedTimestamp &gt; Date.now()){
 ...</pre></li>
     </ul>
 
@@ -5998,21 +5991,21 @@ if(this.delay){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">remove = function (queue, jobId){
   var script = [
-    &#x27;redis.call(&#x22;LREM&#x22;, KEYS[1], 0, ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;LREM&#x22;, KEYS[2], 0, ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;ZREM&#x22;, KEYS[3], ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;LREM&#x22;, KEYS[4], 0, ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;SREM&#x22;, KEYS[5], ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;SREM&#x22;, KEYS[6], ARGV[1])&#x27;,
-    &#x27;redis.call(&#x22;DEL&#x22;, KEYS[7])&#x27;].join(&#x27;\n&#x27;);
+    'redis.call("LREM", KEYS[1], 0, ARGV[1])',
+    'redis.call("LREM", KEYS[2], 0, ARGV[1])',
+    'redis.call("ZREM", KEYS[3], ARGV[1])',
+    'redis.call("LREM", KEYS[4], 0, ARGV[1])',
+    'redis.call("SREM", KEYS[5], ARGV[1])',
+    'redis.call("SREM", KEYS[6], ARGV[1])',
+    'redis.call("DEL", KEYS[7])'].join('\n');
 
   var keys = _.map([
-    &#x27;active&#x27;,
-    &#x27;wait&#x27;,
-    &#x27;delayed&#x27;,
-    &#x27;paused&#x27;,
-    &#x27;completed&#x27;,
-    &#x27;failed&#x27;,
+    'active',
+    'wait',
+    'delayed',
+    'paused',
+    'completed',
+    'failed',
     jobId], function(name){
       return queue.toKey(name);
     }
@@ -6020,7 +6013,7 @@ if(this.delay){
 
   var args = [
     queue.client,
-    &#x27;remove&#x27;,
+    'remove',
     script,
     keys.length,
     keys[0],
@@ -6047,7 +6040,7 @@ if(this.delay){
       });
     }
     // If not, move to failed
-    return _this._moveToSet(&#x27;failed&#x27;);
+    return _this._moveToSet('failed');
   });
 };
 ...</pre></li>
@@ -6063,39 +6056,39 @@ if(this.delay){
     </h2>
     <ul>
     <li>description and source-code<pre class="apidocCodePre">reprocessJob = function (job, options) {
-  var push = (job.opts.lifo ? &#x27;R&#x27; : &#x27;L&#x27;) + &#x27;PUSH&#x27;;
+  var push = (job.opts.lifo ? 'R' : 'L') + 'PUSH';
 
   var script = [
-    &#x27;if (redis.call(&#x22;EXISTS&#x22;, KEYS[1]) == 1) then&#x27;,
-    &#x27;  if (redis.call(&#x22;EXISTS&#x22;, KEYS[2]) == 0) then&#x27;,
-    &#x27;    if (redis.call(&#x22;SREM&#x22;, KEYS[3], ARGV[1]) == 1) then&#x27;,
-    &#x27;      redis.call(&#x22;&#x27; + push + &#x27;&#x22;, KEYS[4], ARGV[1])&#x27;,
-    &#x27;      redis.call(&#x22;PUBLISH&#x22;, KEYS[5], ARGV[1])&#x27;,
-    &#x27;      return 1&#x27;,
-    &#x27;    else&#x27;,
-    &#x27;      return -2&#x27;,
-    &#x27;    end&#x27;,
-    &#x27;  else&#x27;,
-    &#x27;    return -1&#x27;,
-    &#x27;  end&#x27;,
-    &#x27;else&#x27;,
-    &#x27;  return 0&#x27;,
-    &#x27;end&#x27;
-  ].join(&#x27;\n&#x27;);
+    'if (redis.call("EXISTS", KEYS[1]) == 1) then',
+    '  if (redis.call("EXISTS", KEYS[2]) == 0) then',
+    '    if (redis.call("SREM", KEYS[3], ARGV[1]) == 1) then',
+    '      redis.call("' + push + '", KEYS[4], ARGV[1])',
+    '      redis.call("PUBLISH", KEYS[5], ARGV[1])',
+    '      return 1',
+    '    else',
+    '      return -2',
+    '    end',
+    '  else',
+    '    return -1',
+    '  end',
+    'else',
+    '  return 0',
+    'end'
+  ].join('\n');
 
   var queue = job.queue;
 
   var keys = [
     queue.toKey(job.jobId),
-    queue.toKey(job.jobId) + &#x27;:lock&#x27;,
+    queue.toKey(job.jobId) + ':lock',
     queue.toKey(options.state),
-    queue.toKey(&#x27;wait&#x27;),
-    queue.toKey(&#x27;jobs&#x27;)
+    queue.toKey('wait'),
+    queue.toKey('jobs')
   ];
 
   var args = [
     queue.client,
-    &#x27;retryJob&#x27;,
+    'retryJob',
     script,
     5,
     keys[0],
@@ -6116,14 +6109,14 @@ if(this.delay){
 Job.prototype.retry = function(){
 var queue = this.queue;
 var _this = this;
-return scripts.<span class="apidocCodeKeywordSpan">reprocessJob</span>(this, { state: &#x27;failed&#x27; }).then(function(result
+return scripts.<span class="apidocCodeKeywordSpan">reprocessJob</span>(this, { state: 'failed' }).then(function(result
 ) {
   if (result === 1) {
-    queue.emit(&#x27;waiting&#x27;, _this);
+    queue.emit('waiting', _this);
   } else if (result === 0) {
-    throw new Error(&#x27;Couldn\&#x27;t retry job: The job doesn\&#x27;t exist&#x27;);
+    throw new Error('Couldn\'t retry job: The job doesn\'t exist');
   } else if (result === -1) {
-    throw new Error(&#x27;Couldn\&#x27;t retry job: The job is locked&#x27;);
+    throw new Error('Couldn\'t retry job: The job is locked');
   } else if (result === -2) {
 ...</pre></li>
     </ul>
@@ -6139,8 +6132,8 @@ return scripts.<span class="apidocCodeKeywordSpan">reprocessJob</span>(this, { s
     <ul>
     <li>description and source-code<pre class="apidocCodePre">takeLock = function (queue, job, renew, ensureActive){
   var lock = job.lock;
-  if (renew &#x26;&#x26; !lock) {
-    throw new Error(&#x27;Unable to renew nonexisting lock&#x27;);
+  if (renew &amp;&amp; !lock) {
+    throw new Error('Unable to renew nonexisting lock');
   }
   if (renew) {
     return lock.extend(queue.LOCK_DURATION);
@@ -6151,19 +6144,19 @@ return scripts.<span class="apidocCodeKeywordSpan">reprocessJob</span>(this, { s
 
   var redlock;
   if (ensureActive) {
-    var isJobInList = this._isJobInList(&#x27;KEYS[2]&#x27;, &#x27;ARGV[3]&#x27;, &#x27;if&#x27;);
-    var lockAcquired = [&#x27;and redis.call(&#x22;HSET&#x22;, KEYS[3], &#x22;lockAcquired&#x22;, &#x22;1&#x22;)&#x27;].join(&#x27;&#x27;);
-    var success = &#x27;then return 1 else return 0 end&#x27;;
+    var isJobInList = this._isJobInList('KEYS[2]', 'ARGV[3]', 'if');
+    var lockAcquired = ['and redis.call("HSET", KEYS[3], "lockAcquired", "1")'].join('');
+    var success = 'then return 1 else return 0 end';
     var opts = {
       lockScript: function(lockScript) {
         return [
           isJobInList,
-          lockScript.replace(&#x27;return&#x27;, &#x27;and&#x27;),
+          lockScript.replace('return', 'and'),
           lockAcquired,
           success
-        ].join(&#x27;\n&#x27;);
+        ].join('\n');
       },
-      extraLockKeys: [job.queue.toKey(&#x27;active&#x27;), queue.toKey(job.jobId)],
+      extraLockKeys: [job.queue.toKey('active'), queue.toKey(job.jobId)],
       extraLockArgs: [job.jobId]
     };
     redlock = new Redlock(queue.clients, _.extend(opts, queue.redlock));
@@ -6175,7 +6168,7 @@ return scripts.<span class="apidocCodeKeywordSpan">reprocessJob</span>(this, { s
     //
     // Failing to lock due to already locked is not an error.
     //
-    if(err.name != &#x27;LockError&#x27;){
+    if(err.name != 'LockError'){
       throw err;
     }
   });
@@ -6209,45 +6202,45 @@ Job.prototype.takeLock = function(renew, ensureActive){
     <ul>
     <li>description and source-code<pre class="apidocCodePre">updateDelaySet = function (queue, delayedTimestamp){
   var script = [
-    &#x27;local RESULT = redis.call(&#x22;ZRANGE&#x22;, KEYS[1], 0, 0, &#x22;WITHSCORES&#x22;)&#x27;,
-    &#x27;local jobId = RESULT[1]&#x27;,
-    &#x27;local score = RESULT[2]&#x27;,
-    &#x27;if (score ~= nil) then&#x27;,
-    &#x27; score = score / 0x1000 &#x27;,
-    &#x27; if (score &#x3c;= tonumber(ARGV[2])) then&#x27;,
-    &#x27;  redis.call(&#x22;ZREM&#x22;, KEYS[1], jobId)&#x27;,
-    &#x27;  redis.call(&#x22;LREM&#x22;, KEYS[2], 0, jobId)&#x27;,
-    &#x27;  redis.call(&#x22;LPUSH&#x22;, KEYS[3], jobId)&#x27;,
-    &#x27;  redis.call(&#x22;PUBLISH&#x22;, KEYS[4], jobId)&#x27;,
-    &#x27;  redis.call(&#x22;HSET&#x22;, ARGV[1] .. jobId, &#x22;delay&#x22;, 0)&#x27;,
-    &#x27;  local nextTimestamp = redis.call(&#x22;ZRANGE&#x22;, KEYS[1], 0, 0, &#x22;WITHSCORES&#x22;)[2]&#x27;,
-    &#x27;  if(nextTimestamp ~= nil) then&#x27;,
-    &#x27;   nextTimestamp = nextTimestamp / 0x1000&#x27;,
-    &#x27;   redis.call(&#x22;PUBLISH&#x22;, KEYS[1], nextTimestamp)&#x27;,
-    &#x27;  end&#x27;,
-    &#x27;  return nextTimestamp&#x27;,
-    &#x27; end&#x27;,
-    &#x27; return score&#x27;,
-    &#x27;end&#x27;].join(&#x27;\n&#x27;);
+    'local RESULT = redis.call("ZRANGE", KEYS[1], 0, 0, "WITHSCORES")',
+    'local jobId = RESULT[1]',
+    'local score = RESULT[2]',
+    'if (score ~= nil) then',
+    ' score = score / 0x1000 ',
+    ' if (score &lt;= tonumber(ARGV[2])) then',
+    '  redis.call("ZREM", KEYS[1], jobId)',
+    '  redis.call("LREM", KEYS[2], 0, jobId)',
+    '  redis.call("LPUSH", KEYS[3], jobId)',
+    '  redis.call("PUBLISH", KEYS[4], jobId)',
+    '  redis.call("HSET", ARGV[1] .. jobId, "delay", 0)',
+    '  local nextTimestamp = redis.call("ZRANGE", KEYS[1], 0, 0, "WITHSCORES")[2]',
+    '  if(nextTimestamp ~= nil) then',
+    '   nextTimestamp = nextTimestamp / 0x1000',
+    '   redis.call("PUBLISH", KEYS[1], nextTimestamp)',
+    '  end',
+    '  return nextTimestamp',
+    ' end',
+    ' return score',
+    'end'].join('\n');
 
   var keys = _.map([
-    &#x27;delayed&#x27;,
-    &#x27;active&#x27;,
-    &#x27;wait&#x27;,
-    &#x27;jobs&#x27;], function(name){
+    'delayed',
+    'active',
+    'wait',
+    'jobs'], function(name){
       return queue.toKey(name);
   });
 
   var args = [
     queue.client,
-    &#x27;updateDelaySet&#x27;,
+    'updateDelaySet',
     script,
     keys.length,
     keys[0],
     keys[1],
     keys[2],
     keys[3],
-    queue.toKey(&#x27;&#x27;),
+    queue.toKey(''),
     delayedTimestamp
   ];
 
@@ -6316,8 +6309,8 @@ var job = new Job(queue, data, opts);
 
 return addJob(queue, job).then(function(jobId){
   job.jobId = jobId;
-  queue.<span class="apidocCodeKeywordSpan">distEmit</span>(&#x27;waiting&#x27;, job.toJSON());
-  debuglog(&#x27;Job added&#x27;, jobId);
+  queue.<span class="apidocCodeKeywordSpan">distEmit</span>('waiting', job.toJSON());
+  debuglog('Job added', jobId);
   return job;
 });
 };
@@ -6384,14 +6377,14 @@ queue.resume().then(function(){
 
 A queue emits also some useful events:
 ```javascript
-.<span class="apidocCodeKeywordSpan">on</span>(&#x27;ready&#x27;, function() {
+.<span class="apidocCodeKeywordSpan">on</span>('ready', function() {
   // Queue ready for job
   // All Redis connections are done
 })
-.on(&#x27;error&#x27;, function(error) {
+.on('error', function(error) {
   // Error
 })
-.on(&#x27;active&#x27;, function(job, jobPromise){
+.on('active', function(job, jobPromise){
 ...</pre></li>
     </ul>
 
@@ -6422,12 +6415,12 @@ A queue emits also some useful events:
 }
 
 function removeListeners(){
-  _this.queue.<span class="apidocCodeKeywordSpan">removeListener</span>(&#x27;completed&#x27;, onCompleted);
-  _this.queue.removeListener(&#x27;failed&#x27;, onFailed);
+  _this.queue.<span class="apidocCodeKeywordSpan">removeListener</span>('completed', onCompleted);
+  _this.queue.removeListener('failed', onFailed);
 }
 
-_this.queue.on(&#x27;completed&#x27;, onCompleted);
-_this.queue.on(&#x27;failed&#x27;, onFailed);
+_this.queue.on('completed', onCompleted);
+_this.queue.on('failed', onFailed);
 
 //
 ...</pre></li>
@@ -6477,7 +6470,7 @@ _this.queue.on(&#x27;failed&#x27;, onFailed);
   }
   clearTimeout(timer.timer);
   delete timers[id];
-  if(!this.idle &#x26;&#x26; (_.size(timers) === 0)){
+  if(!this.idle &amp;&amp; (_.size(timers) === 0)){
     while(this.listeners.length){
       this.listeners.pop()();
     }
@@ -6587,3 +6580,4 @@ var timer = setTimeout(function (timerInstance, timeoutId) {
     ]
 </div>
 </div>
+</body></html>
